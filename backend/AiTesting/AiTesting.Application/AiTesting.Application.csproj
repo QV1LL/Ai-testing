@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AiTesting.Infrastructure\AiTesting.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

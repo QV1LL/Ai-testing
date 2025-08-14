@@ -6,9 +6,11 @@ import JoinTestSection from "../../components/HomePage/JoinTestSection";
 import FeaturesSection from "../../components/HomePage/FeaturesSection";
 import CTASection from "../../components/HomePage/CTASection";
 import "./HomePage.css";
+import AuthModal from "../../components/AuthModal/AuthModal";
 
 const HomePage: React.FC = () => {
   const [testId, setTestId] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
 
   const handleJoinTest = () => {
     if (testId.trim()) {
@@ -19,6 +21,13 @@ const HomePage: React.FC = () => {
   return (
     <div className="home-container">
       <Header />
+      {showModal && (
+        <AuthModal
+          defaultMode="login"
+          isOpen={true}
+          onClose={() => setShowModal(false)}
+        />
+      )}
       <HeroSection />
       <JoinTestSection
         testId={testId}
