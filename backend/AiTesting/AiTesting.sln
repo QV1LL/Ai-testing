@@ -5,6 +5,10 @@ VisualStudioVersion = 17.14.36327.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiTesting.Api", "AiTesting.Api\AiTesting.Api.csproj", "{9E9F5358-3C27-48B7-950C-1CA43C80D2AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiTesting.Domain", "AiTesting.Domain\AiTesting.Domain.csproj", "{76DB76E8-3422-49EC-99BA-19A9E38006C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiTesting.Infrastructure", "AiTesting.Infrastructure\AiTesting.Infrastructure.csproj", "{B1B6A60F-8236-41B2-B164-C5A9E44F4069}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{9E9F5358-3C27-48B7-950C-1CA43C80D2AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E9F5358-3C27-48B7-950C-1CA43C80D2AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E9F5358-3C27-48B7-950C-1CA43C80D2AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76DB76E8-3422-49EC-99BA-19A9E38006C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DB76E8-3422-49EC-99BA-19A9E38006C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DB76E8-3422-49EC-99BA-19A9E38006C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DB76E8-3422-49EC-99BA-19A9E38006C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B6A60F-8236-41B2-B164-C5A9E44F4069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B6A60F-8236-41B2-B164-C5A9E44F4069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B6A60F-8236-41B2-B164-C5A9E44F4069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B6A60F-8236-41B2-B164-C5A9E44F4069}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

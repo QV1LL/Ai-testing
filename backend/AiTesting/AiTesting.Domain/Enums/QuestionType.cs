@@ -2,5 +2,7 @@
 
 public enum QuestionType
 {
-
+    SingleChoice,
+    MultipleChoice,
+    OpenEnded,
 }

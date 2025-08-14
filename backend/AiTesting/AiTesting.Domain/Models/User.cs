@@ -69,18 +69,33 @@ public class User : IUser
         Role = role;
     }
 
-    public static Result<User> Create(string email, 
+    public static Result<User> CreateDefault(string email, 
                               string passwordHash, 
-                              string displayName, 
-                              UserRole role = UserRole.Default)
+                              string displayName)
     {
         try
         {
             return Result<User>.Success(
-                new User(Guid.NewGuid(), email, passwordHash, displayName, role)
+                new User(Guid.NewGuid(), email, passwordHash, displayName, UserRole.Default)
                 );
         }
         catch(ArgumentException ex)
+        {
+            return Result<User>.Failure(ex.Message);
+        }
+    }
+
+    public static Result<User> CreateAdmin(string email,
+                              string passwordHash,
+                              string displayName)
+    {
+        try
+        {
+            return Result<User>.Success(
+                new User(Guid.NewGuid(), email, passwordHash, displayName, UserRole.Admin)
+                );
+        }
+        catch (ArgumentException ex)
         {
             return Result<User>.Failure(ex.Message);
         }

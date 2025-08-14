@@ -5,6 +5,7 @@ namespace AiTesting.Domain.Models;
 public class Guest : IUser
 {
     public Guid Id { get; private set; }
+
     public string DisplayName
     {
         get => field;
