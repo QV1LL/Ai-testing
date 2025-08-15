@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Footer.css";
+import styles from "./Footer.module.css";
 import { FaGithub } from "react-icons/fa";
 import AuthModal from "../AuthModal/AuthModal";
 
@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
   const [defaultMode, setDefaultMode] = useState("login");
 
   return (
-    <footer className="footer">
+    <footer className={styles.footer}>
       {showModal && (
         <AuthModal
           defaultMode={defaultMode}
@@ -16,8 +16,8 @@ const Footer: React.FC = () => {
           onClose={() => setShowModal(false)}
         />
       )}
-      <div className="footer-columns">
-        <div className="footer-column">
+      <div className={styles.footerColumns}>
+        <div className={styles.footerColumn}>
           <h4>Your Account</h4>
           <ul>
             <li>
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div className="footer-column">
+        <div className={styles.footerColumn}>
           <h4>Sections</h4>
           <ul>
             <li>
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div className="footer-column">
+        <div className={styles.footerColumn}>
           <h4>Information</h4>
           <ul>
             <li>
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div className="footer-column">
+        <div className={styles.footerColumn}>
           <h4>Contact</h4>
           <ul>
             <li>
@@ -81,7 +81,7 @@ const Footer: React.FC = () => {
                 href="https://github.com/QV1LL/Ai-testing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="social-link"
+                className={styles.socialLink}
               >
                 <FaGithub size={20} /> View on GitHub
               </a>
@@ -90,7 +90,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="footer-bottom">
+      <div className={styles.footerBottom}>
         <p translate="no">© {new Date().getFullYear()}, AI Testing</p>
       </div>
     </footer>

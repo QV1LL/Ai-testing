@@ -1,5 +1,5 @@
 import React from "react";
-import "./PrivacyPolicyPage.css";
+import styles from "./PrivacyPolicyPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
@@ -7,8 +7,8 @@ const PrivacyPolicyPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="page-container">
-        <div className="content-container">
+      <div className={styles.pageContainer}>
+        <div className={styles.contentContainer}>
           <p>
             We collect only the data necessary to provide our services. Your
             information is never sold to third parties.

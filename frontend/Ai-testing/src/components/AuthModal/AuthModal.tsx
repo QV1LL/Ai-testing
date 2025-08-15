@@ -29,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setName("");
     setEmail("");
     setPassword("");
-    onClose(); // close modal after submission
+    onClose();
   };
 
   return (

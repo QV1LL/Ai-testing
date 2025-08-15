@@ -1,9 +1,11 @@
+import styles from "./CTASection.module.css";
+
 const CTASection: React.FC = () => (
-  <section className="cta">
+  <section className={styles.cta}>
     <h2>Ready to Get Started?</h2>
     <p>
-      Join hundreds of professionals using AI Testing to evaluate skills faster
-      and smarter.
+      Join hundreds of professionals using{" "}
+      <span translate="no">AI Testing</span>
     </p>
     <button
       className="primary-btn"

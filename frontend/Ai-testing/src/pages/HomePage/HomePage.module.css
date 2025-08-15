@@ -1,0 +1,14 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: radial-gradient(#ddd 20%, #92b1da);
+}
+
+.homeContainer {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  flex-direction: column;
+}

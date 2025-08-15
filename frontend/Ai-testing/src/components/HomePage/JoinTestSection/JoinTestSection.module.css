@@ -1,0 +1,32 @@
+.joinTest {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.joinTest h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.joinForm {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.joinForm input {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.joinForm input:focus {
+  border-color: #2a5298;
+}
+
+.joinForm button {
+  min-width: 100px;
+}

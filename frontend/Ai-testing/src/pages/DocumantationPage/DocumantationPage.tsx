@@ -1,5 +1,5 @@
 import React from "react";
-import "./DocumantationPage.css";
+import styles from "./DocumantationPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
@@ -7,8 +7,8 @@ const DocumentationPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="page-container">
-        <div className="content-container">
+      <div className={styles.pageContainer}>
+        <div className={styles.contentContainer}>
           <h2>Getting Started</h2>
           <p>1. Log in or register for an account.</p>
           <p>2. Click "Create Test" to design a new AI-powered test.</p>

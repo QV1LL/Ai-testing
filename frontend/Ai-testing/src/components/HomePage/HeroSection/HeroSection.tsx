@@ -1,13 +1,15 @@
+import styles from "./HeroSection.module.css";
+
 const HeroSection: React.FC = () => (
-  <section className="hero">
-    <div className="hero-content">
+  <section className={styles.hero}>
+    <div className={styles.heroContent}>
       <h1>
-        Welcome to <span translate="no">AI Testing</span>
+        Welcome to <span translate="no"> AI Testing</span>
       </h1>
       <p>
         Create, manage, and take AI-powered tests. Smart. Reliable. Accessible.
       </p>
-      <div className="quick-actions">
+      <div className={styles.quickActions}>
         <button
           className="primary-btn"
           onClick={() => (window.location.href = "/create-test")}

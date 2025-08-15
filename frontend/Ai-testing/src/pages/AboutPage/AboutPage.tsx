@@ -1,5 +1,5 @@
 import React from "react";
-import "./AboutPage.css";
+import styles from "./AboutPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
@@ -7,8 +7,8 @@ const AboutPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="page-container">
-        <div className="content-container">
+      <div className={styles.pageContainer}>
+        <div className={styles.contentContainer}>
           <h2>About AI Testing</h2>
           <p>
             AI Testing is an innovative platform that helps educators and

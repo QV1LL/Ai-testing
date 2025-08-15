@@ -1,3 +1,5 @@
+import styles from "./JoinTestSection.module.css";
+
 interface JoinTestSectionProps {
   testId: string;
   onChange: (value: string) => void;
@@ -9,9 +11,9 @@ const JoinTestSection: React.FC<JoinTestSectionProps> = ({
   onChange,
   onJoin,
 }) => (
-  <section className="join-test">
+  <section className={styles.joinTest}>
     <h2>Join a Test</h2>
-    <div className="join-form">
+    <div className={styles.joinForm}>
       <input
         type="text"
         placeholder="Enter Test ID"

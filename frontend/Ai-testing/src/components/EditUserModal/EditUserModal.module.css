@@ -1,13 +1,11 @@
-/* AuthModal.module.css */
-
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(6px); /* blur background */
-  background-color: rgba(0, 0, 0, 0.4); /* semi-transparent overlay */
+  backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +16,7 @@
   background: white;
   border-radius: 12px;
   padding: 40px 30px;
-  max-width: 400px;
+  max-width: 420px;
   width: 90%;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   position: relative;
@@ -28,6 +26,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   text-align: center;
+  color: black;
 }
 
 .closeBtn {
@@ -40,26 +39,24 @@
   cursor: pointer;
 }
 
-.modalHeader {
-  color: black;
+.form {
+  margin-top: 20px;
 }
 
 .formGroup {
   margin-bottom: 20px;
   width: 100%;
-
-  label {
-    color: black;
-  }
 }
 
 .formGroup label {
   display: block;
   margin-bottom: 5px;
   font-weight: 600;
+  color: black;
 }
 
-.formGroup input {
+.formGroup input,
+.formGroup select {
   width: 100%;
   box-sizing: border-box;
   padding: 10px;
@@ -81,16 +78,4 @@
 
 .primaryBtn:hover {
   background-color: #1d4ed8;
-}
-
-.toggleText {
-  text-align: center;
-  margin-top: 15px;
-  color: #374151;
-}
-
-.toggleLink {
-  color: #1e40af;
-  cursor: pointer;
-  font-weight: 600;
 }

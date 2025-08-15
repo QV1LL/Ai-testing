@@ -1,0 +1,27 @@
+:root {
+  --profile-avatar-size: 200px;
+  --profile-items-gap: 4rem;
+  --content-max-width: 1000px;
+}
+
+.profilePage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(#ddd 20%, #92b1da);
+}
+
+.wrapper {
+  display: flex;
+  padding: 0 2rem;
+  justify-content: center;
+}
+
+.container {
+  max-width: var(--content-max-width);
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+}

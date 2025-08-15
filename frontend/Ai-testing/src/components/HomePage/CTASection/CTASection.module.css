@@ -1,0 +1,16 @@
+.cta {
+  padding: 4rem 1rem;
+  text-align: center;
+  background: linear-gradient(135deg, #2a5298, #4a6fa1);
+  color: white;
+}
+
+.cta h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta p {
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}

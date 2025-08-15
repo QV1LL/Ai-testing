@@ -1,0 +1,76 @@
+.testsSection {
+  width: 100%;
+  margin: 3rem 0;
+  display: flex;
+  justify-content: space-around;
+  gap: 2rem;
+  flex-direction: column;
+  flex-wrap: wrap; /* allow wrapping on smaller screens */
+}
+
+/* Each table wrapper */
+.testTableWrapper {
+  flex: 1 1 45%; /* two tables side by side, shrinkable */
+  min-width: 280px;
+}
+
+.testTableWrapper h3 {
+  margin-bottom: 0.5rem;
+  color: #1e3c72;
+  font-size: 1.25rem;
+}
+
+/* Modern minimal table */
+.testTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.testTable th,
+.testTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.testTable th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.testTable tr:last-child td {
+  border-bottom: none;
+}
+
+.testTable tr:hover {
+  background-color: #f3f4f6;
+  transition: background-color 0.2s ease;
+}
+
+.testTable button {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #1e40af;
+  color: white;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.testTable button:hover {
+  opacity: 0.85;
+  background: #1e3c72;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .testsSection {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
