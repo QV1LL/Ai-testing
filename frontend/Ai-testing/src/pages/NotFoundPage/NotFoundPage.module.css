@@ -1,0 +1,62 @@
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.notFoundPage {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #ddd 20%, #92b1da 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.NotFoundHeader {
+  font-size: 6rem;
+  color: #1e3c72;
+  margin: 0;
+}
+
+.NotFoundSecondHeader {
+  font-size: 2rem;
+  margin: 0.5rem 0 1rem;
+  color: #1e3c72;
+}
+
+.NotFoundDesc {
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.homeBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #1e40af;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.homeBtn:hover {
+  background-color: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .content {
+    background: transparent;
+    box-shadow: none;
+  }
+}

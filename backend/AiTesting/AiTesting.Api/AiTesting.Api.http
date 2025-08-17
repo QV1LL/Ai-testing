@@ -1,6 +1,18 @@
 @AiTesting.Api_HostAddress = http://localhost:5177
 
-GET {{AiTesting.Api_HostAddress}}/weatherforecast/
+POST {{AiTesting.Api_HostAddress}}/api/users
 Accept: application/json
 
 ###
+POST {{AiTesting.Api_HostAddress}}/api/users/create-oleg
+Content-Type: application/json
+
+{
+  "name": "Oleg",
+  "email": "oleg@example.com",
+  "password": "SecurePassword123"
+}
+
+### Отримати користувача по ID
+GET {{AiTesting.Api_HostAddress}}/api/users/{{userId}}
+Accept: application/json

@@ -21,7 +21,7 @@ const ProfilePage: React.FC = () => {
         />
       )}
       <ProfileCardSection
-        name="Bohdan"
+        name="Myroslaw"
         email="some@example.com"
         onEditButtonClick={() => setShowEditModal(true)}
       />
