@@ -1,5 +1,6 @@
-﻿using AiTesting.Application.Users.Command;
-using AiTesting.Application.Users.Handlers;
+﻿using AiTesting.Application.Users.Dto.Profile;
+using AiTesting.Application.Users.Services.Profile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AiTesting.Api.Controllers;
@@ -8,39 +9,47 @@ namespace AiTesting.Api.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly RegisterUserHandler _registerHandler;
-    private readonly GetUserHandler _getUserHandler;
+    private readonly IUserProfileService _userProfileService;
 
-    public UsersController(RegisterUserHandler registerHandler,
-                           GetUserHandler getUserHandler)
+    public UsersController(IUserProfileService userProfileService)
     {
-        _registerHandler = registerHandler;
-        _getUserHandler = getUserHandler;
-
+        _userProfileService = userProfileService;
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetUserById(Guid id)
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
     {
-        var userResult = await _getUserHandler.Handle(new GetUserCommand(id));
-        if (userResult.IsFailure) return NotFound();
-        return Ok(userResult.Value);
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized(new { message = "Invalid token" });
+
+        var userId = Guid.Parse(userIdClaim.Value);
+
+        var result = await _userProfileService.GetProfile(userId);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+
+        return NotFound(new { message = result.Error });
     }
 
 
-
-    [HttpPost]
-    public async Task<IActionResult> RegisterUser([FromBody] RegisterUserCommand command)
+    [Authorize]
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UserDto dto)
     {
-        var result = await _registerHandler.Handle(command);
+        // Тут потрібно реалізувати метод оновлення в IUserProfileService
+        // Наприклад: UpdateProfileAsync(id, dto)
+        return StatusCode(501, new { message = "Not implemented yet" });
+    }
 
-        if (!result.IsSuccess)
-            return BadRequest(result.Error);
-
-        return CreatedAtAction(
-            nameof(GetUserById),         
-            new { id = result.Value.Id },  
-            result.Value                  
-        );
+    [Authorize]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        // Тут потрібно реалізувати метод видалення в IUserProfileService або IUserService
+        // Наприклад: DeleteAsync(id)
+        return StatusCode(501, new { message = "Not implemented yet" });
     }
 }

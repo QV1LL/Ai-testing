@@ -4,8 +4,9 @@ namespace AiTesting.Domain.Services.User;
 
 public interface IUserService
 {
-    Task<Result<Models.User>> Get(Guid id);
-    Task<Result> Add(Models.User user);
-    Task<Result> Update(Models.User user);
-    Task<Result> Delete(Models.User user);
+    Task<Result<Models.User>> GetAsync(Guid id);
+    Task<Result<Models.User>> GetByEmailAsync(string email);
+    Task<Result> AddAsync(Models.User user);
+    Task<Result> UpdateAsync(Models.User user);
+    Task<Result> DeleteAsync(Models.User user);
 }

@@ -14,7 +14,7 @@ public class UserService : IUserService
         _userRepository = unitOfWork.Users;
     }
 
-    public async Task<Result> Add(Models.User user)
+    public async Task<Result> AddAsync(Models.User user)
     {
         await _userRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -22,7 +22,7 @@ public class UserService : IUserService
         return Result.Success();
     }
 
-    public async Task<Result> Delete(Models.User user)
+    public async Task<Result> DeleteAsync(Models.User user)
     {
         await _userRepository.DeleteAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -30,7 +30,7 @@ public class UserService : IUserService
         return Result.Success();
     }
 
-    public async Task<Result<Models.User>> Get(Guid id)
+    public async Task<Result<Models.User>> GetAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id);
 
@@ -39,7 +39,16 @@ public class UserService : IUserService
                Result<Models.User>.Success(user);
     }
 
-    public async Task<Result> Update(Models.User user)
+    public async Task<Result<Models.User>> GetByEmailAsync(string email)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+
+        return user == null ?
+               Result<Models.User>.Failure("User not found") :
+               Result<Models.User>.Success(user);
+    }
+
+    public async Task<Result> UpdateAsync(Models.User user)
     {
         await _userRepository.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();

@@ -1,18 +1,20 @@
 @AiTesting.Api_HostAddress = http://localhost:5177
 
-POST {{AiTesting.Api_HostAddress}}/api/users
-Accept: application/json
-
-###
-POST {{AiTesting.Api_HostAddress}}/api/users/create-oleg
+### Register user
+POST {{AiTesting.Api_HostAddress}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Oleg",
   "email": "oleg@example.com",
-  "password": "SecurePassword123"
+  "password": "StrongPass123!",
+  "name": "Oleg"
 }
 
-### Отримати користувача по ID
-GET {{AiTesting.Api_HostAddress}}/api/users/{{userId}}
-Accept: application/json
+### fadsfaf
+POST {{AiTesting.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "oleg@example.com",
+  "password": "StrongPass123!"
+}

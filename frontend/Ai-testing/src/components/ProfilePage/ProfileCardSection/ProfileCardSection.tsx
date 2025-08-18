@@ -5,6 +5,7 @@ interface ProfileCardProps {
   email: string;
   avatarUrl?: string;
   onEditButtonClick: () => void;
+  onLogOutButtonClick: () => void;
 }
 
 const ProfileCardSection: React.FC<ProfileCardProps> = ({
@@ -12,6 +13,7 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
   email,
   avatarUrl,
   onEditButtonClick,
+  onLogOutButtonClick,
 }) => {
   return (
     <div className={styles.wrapper}>
@@ -43,7 +45,10 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
               >
                 Edit Profile
               </button>
-              <button className={`${styles.secondaryBtn} secondary-btn`}>
+              <button
+                onClick={() => onLogOutButtonClick()}
+                className={`${styles.secondaryBtn} secondary-btn`}
+              >
                 Logout
               </button>
             </div>

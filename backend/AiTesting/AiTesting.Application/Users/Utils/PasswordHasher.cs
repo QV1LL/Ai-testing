@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace AiTesting.Application.Users.Services;
+namespace AiTesting.Application.Users.Utils;
 
 public class PasswordHasher : IPasswordHasher
 {

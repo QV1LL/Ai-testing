@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./DocumantationPage.module.css";
+import styles from "./DocumentationPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 

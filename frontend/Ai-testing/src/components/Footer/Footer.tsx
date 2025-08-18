@@ -1,44 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./Footer.module.css";
 import { FaGithub } from "react-icons/fa";
-import AuthModal from "../AuthModal/AuthModal";
 
 const Footer: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [defaultMode, setDefaultMode] = useState("login");
-
   return (
     <footer className={styles.footer}>
-      {showModal && (
-        <AuthModal
-          defaultMode={defaultMode}
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-        />
-      )}
       <div className={styles.footerColumns}>
         <div className={styles.footerColumn}>
           <h4>Your Account</h4>
           <ul>
             <li>
-              <a
-                onClick={() => {
-                  setDefaultMode("login");
-                  setShowModal(true);
-                }}
-              >
-                Log in
-              </a>
+              <a href="/auth?mode=login">Log in</a>
             </li>
             <li>
-              <a
-                onClick={() => {
-                  setDefaultMode("signup");
-                  setShowModal(true);
-                }}
-              >
-                Sign up
-              </a>
+              <a href="/auth?mode=signup">Sign up</a>
             </li>
           </ul>
         </div>

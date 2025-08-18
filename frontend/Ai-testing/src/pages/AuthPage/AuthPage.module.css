@@ -1,0 +1,120 @@
+/* AuthModal.module.css */
+
+.authPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle at top, #ddd 20%, #92b1da 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pageWrapper {
+  display: flex;
+  padding: 2rem;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.formContainer {
+  background: white;
+  border-radius: 12px;
+  padding: 40px 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.modalHeader {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modalHeader {
+  color: black;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+  width: 100%;
+
+  label {
+    color: black;
+  }
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.formGroup input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: #1e40af;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.toggleText {
+  text-align: center;
+  margin-top: 15px;
+  color: #374151;
+}
+
+.toggleLink {
+  color: #1e40af;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.formGroup input.errorInput {
+  border: 2px solid #c15755;
+}
+
+.errorText {
+  color: #c15755;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 0;
+  }
+  .formContainer {
+    background: transparent;
+    box-shadow: none;
+    padding: 4rem 2rem;
+  }
+}

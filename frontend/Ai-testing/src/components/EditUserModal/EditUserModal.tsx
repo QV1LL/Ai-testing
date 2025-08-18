@@ -3,7 +3,7 @@ import styles from "./EditUserModal.module.css";
 
 interface EditUserModalProps {
   isOpen: boolean;
-  userData: { name: string; email: string; role: string } | null;
+  userData: { name: string; email: string } | null;
   onClose: () => void;
   onSave: (updatedUser: { name: string; email: string }) => void;
 }

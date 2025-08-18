@@ -1,4 +1,4 @@
-﻿namespace AiTesting.Application.Users.Services;
+﻿namespace AiTesting.Application.Users.Utils;
 
 public interface IPasswordHasher
 {
