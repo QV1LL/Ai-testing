@@ -10,13 +10,9 @@ export interface RegisterDto {
 }
 
 export interface LoginResult {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   userId: string;
   displayName: string;
-  email: string;
-}
-
-export interface ProfileDto {
-  name: string;
   email: string;
 }

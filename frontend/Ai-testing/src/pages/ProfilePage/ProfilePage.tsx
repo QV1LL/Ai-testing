@@ -6,29 +6,29 @@ import styles from "./ProfilePage.module.css";
 import ProfileCardSection from "../../components/ProfilePage/ProfileCardSection/ProfileCardSection";
 import InteractedTestsSection from "../../components/ProfilePage/InteractedTestsSection/InteractedTestsSection";
 import EditUserModal from "../../components/EditUserModal/EditUserModal";
-import { getProfile } from "../../api/profileService";
+import { deleteProfile, getProfile } from "../../api/profileService";
 import { logout } from "../../api/profileService";
-import type { ProfileDto } from "../../types/user";
+import type { ProfileDto } from "../../types/profile";
+
+const mockProfile: ProfileDto = {
+  name: "Loading...",
+  email: "loading@example.com",
+};
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [profile, setProfile] = useState<ProfileDto | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<ProfileDto>(mockProfile);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
-      setLoading(true);
       setError("");
       try {
         const data = await getProfile();
         setProfile(data);
       } catch (err: any) {
-        setError("Failed to load profile");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -40,9 +40,15 @@ const ProfilePage: React.FC = () => {
     navigate("/");
   };
 
-  if (loading) return <p>Loading profile...</p>;
+  const handleDelete = () => {
+    try {
+      deleteProfile();
+      logout();
+      navigate("/");
+    } catch {}
+  };
+
   if (error) return <p>{error}</p>;
-  if (!profile) return <p>No profile data</p>;
 
   return (
     <div className={styles.profilePage}>
@@ -52,7 +58,9 @@ const ProfilePage: React.FC = () => {
           isOpen={showEditModal}
           userData={profile}
           onClose={() => setShowEditModal(false)}
-          onSave={() => console.log("Save profile")}
+          onSave={(updatedUser) =>
+            setProfile({ name: updatedUser.name, email: updatedUser.email })
+          }
         />
       )}
       <ProfileCardSection
@@ -60,6 +68,7 @@ const ProfilePage: React.FC = () => {
         email={profile.email}
         onEditButtonClick={() => setShowEditModal(true)}
         onLogOutButtonClick={handleLogout}
+        onDeleteButtonClick={handleDelete}
       />
       <div className={styles.wrapper}>
         <div className={styles.container}>

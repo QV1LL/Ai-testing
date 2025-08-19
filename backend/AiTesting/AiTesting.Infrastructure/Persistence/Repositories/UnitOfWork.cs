@@ -1,24 +1,29 @@
 ﻿using AiTesting.Domain.Common;
 using AiTesting.Domain.Repositories;
-using AiTesting.Infrastructure.Persistence.Repositories.Concreate;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiTesting.Infrastructure.Persistence.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
+    public IGuestRepository Guests { get; }
     public IUserRepository Users { get; }
     public ITestRepository Tests { get; }
     public ITestAttemptRepository TestAttempts { get; }
 
     private readonly DbContext _dbContext;
 
-    public UnitOfWork(DbContext dbContext)
+    public UnitOfWork(DbContext dbContext,
+                      IGuestRepository guestRepository,
+                      IUserRepository userRepository,
+                      ITestRepository testRepository,
+                      ITestAttemptRepository testAttemptRepository)
     {
         _dbContext = dbContext;
-        Users = new UserRepository(dbContext);
-        Tests = new TestRepository(dbContext);
-        TestAttempts = new TestAttemptRepository(dbContext);
+        Guests = guestRepository;
+        Users = userRepository;
+        Tests = testRepository;
+        TestAttempts = testAttemptRepository;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -4,7 +4,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import styles from "./AuthPage.module.css";
 import * as authService from "../../api/authService";
-import type { LoginDto, RegisterDto, LoginResult } from "../../types/user";
+import type { LoginDto, RegisterDto } from "../../types/user";
 
 const AuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -21,33 +21,31 @@ const AuthPage: React.FC = () => {
     setIsSignUp(mode === "signup");
   }, [searchParams]);
 
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setError("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      let result: LoginResult;
-
       if (isSignUp) {
         const data: RegisterDto = { name, email, password };
-        result = await authService.register(data);
+        await authService.register(data);
       } else {
         const data: LoginDto = { email, password };
-        result = await authService.login(data);
+        await authService.login(data);
       }
 
-      localStorage.setItem("access_token", result.token);
-      localStorage.setItem("userId", result.userId);
-      localStorage.setItem("displayName", result.displayName);
-
       navigate("/profile");
+      resetForm();
     } catch (err: any) {
       setError(err.response?.data?.message || "Something went wrong");
     }
-
-    setName("");
-    setEmail("");
-    setPassword("");
   };
 
   return (
@@ -67,6 +65,7 @@ const AuthPage: React.FC = () => {
                   placeholder="Enter your name"
                   required
                   className={error ? styles.errorInput : ""}
+                  onFocus={() => setError("")}
                 />
               </div>
             )}
@@ -109,7 +108,10 @@ const AuthPage: React.FC = () => {
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <span
                 className={styles.toggleLink}
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  resetForm();
+                }}
               >
                 {isSignUp ? "Login" : "Sign Up"}
               </span>

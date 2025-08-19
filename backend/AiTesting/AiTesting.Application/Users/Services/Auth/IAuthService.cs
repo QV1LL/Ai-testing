@@ -5,6 +5,7 @@ namespace AiTesting.Application.Users.Services.Auth;
 
 public interface IAuthService
 {
-    Task<Result<LoginResultDto>> Register(RegisterUserDto dto);
-    Task<Result<LoginResultDto>> Login(LoginDto dto);
+    Task<Result<AuthResultDto>> Register(RegisterUserDto dto);
+    Task<Result<AuthResultDto>> Login(LoginDto dto);
+    Task<Result<AuthResultDto>> Refresh(RefreshTokenDto dto);
 }

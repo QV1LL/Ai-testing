@@ -36,20 +36,34 @@ public class UsersController : ControllerBase
 
 
     [Authorize]
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UserDto dto)
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
     {
-        // Тут потрібно реалізувати метод оновлення в IUserProfileService
-        // Наприклад: UpdateProfileAsync(id, dto)
-        return StatusCode(501, new { message = "Not implemented yet" });
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized(new { message = "Invalid token" });
+
+        var userId = Guid.Parse(userIdClaim.Value);
+        var result = await _userProfileService.UpdateProfile(userId, dto);
+
+        return result.IsSuccess ?
+               NoContent() :
+               BadRequest(new { message = result.Error });        
     }
 
     [Authorize]
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteUser(Guid id)
+    [HttpDelete("profile")]
+    public async Task<IActionResult> DeleteUser()
     {
-        // Тут потрібно реалізувати метод видалення в IUserProfileService або IUserService
-        // Наприклад: DeleteAsync(id)
-        return StatusCode(501, new { message = "Not implemented yet" });
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized(new { message = "Invalid token" });
+
+        var userId = Guid.Parse(userIdClaim.Value);
+        var result = await _userProfileService.DeleteProfile(userId);
+
+        return result.IsSuccess ?
+               NoContent() :
+               BadRequest(new { message = result.Error });
     }
 }

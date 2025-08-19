@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./EditUserModal.module.css";
+import { updateProfile } from "../../api/profileService";
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (userData) {
@@ -26,10 +28,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, email });
-    onClose();
+
+    try {
+      await updateProfile({ name, email });
+      onSave({ name, email });
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -46,6 +54,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className={error ? styles.errorInput : ""}
+              onFocus={() => setError("")}
               required
             />
           </div>
@@ -55,12 +65,15 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className={error ? styles.errorInput : ""}
+              onFocus={() => setError("")}
               required
             />
           </div>
           <button type="submit" className={styles.primaryBtn}>
             Save Changes
           </button>
+          {error && <p className={styles.errorText}>{error}</p>}
         </form>
       </div>
     </div>

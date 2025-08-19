@@ -4,6 +4,7 @@ namespace AiTesting.Domain.Common;
 
 public interface IUnitOfWork
 {
+    IGuestRepository Guests { get; }
     IUserRepository Users { get; }
     ITestRepository Tests { get; }
     ITestAttemptRepository TestAttempts { get; }

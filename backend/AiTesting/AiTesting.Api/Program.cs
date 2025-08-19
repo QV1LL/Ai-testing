@@ -30,6 +30,7 @@ builder.Services.AddAuthentication("Bearer")
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
@@ -40,7 +41,7 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost",
+    options.AddPolicy("AllowFrontend",
         policy =>
         {
             policy.WithOrigins("http://192.168.1.105:5173")
@@ -63,9 +64,9 @@ using(var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-app.UseCors("AllowLocalhost");
 
 await app.RunAsync();

@@ -16,21 +16,25 @@ public class UserService : IUserService
 
     public async Task<Result> AddAsync(Models.User user)
     {
+        var userWithTheSameEmail = await _userRepository.GetByEmailAsync(user.Email);
+
+        if (userWithTheSameEmail != null) return Result.Failure($"User with email {user.Email} already exists");
+
         await _userRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(Models.User user)
+    public async Task<Result> DeleteAsync(Guid id)
     {
-        await _userRepository.DeleteAsync(user);
+        await _userRepository.DeleteByIdAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
     }
 
-    public async Task<Result<Models.User>> GetAsync(Guid id)
+    public async Task<Result<Models.User>> GetByIdAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id);
 
@@ -50,6 +54,11 @@ public class UserService : IUserService
 
     public async Task<Result> UpdateAsync(Models.User user)
     {
+        var userWithTheSameEmail = await _userRepository.GetByEmailAsync(user.Email);
+
+        if (userWithTheSameEmail != null && userWithTheSameEmail.Id != user.Id) 
+            return Result.Failure($"User with email {user.Email} already exists");
+
         await _userRepository.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();
 

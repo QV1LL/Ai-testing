@@ -76,6 +76,16 @@
   cursor: pointer;
 }
 
+.formGroup input.errorInput {
+  border: 2px solid #c15755;
+}
+
+.errorText {
+  color: #c15755;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
 .primaryBtn:hover {
   background-color: #1d4ed8;
 }

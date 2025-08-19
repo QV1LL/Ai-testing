@@ -1,5 +1,6 @@
 ﻿using AiTesting.Application.Users.Services.Auth;
 using AiTesting.Application.Users.Services.Profile;
+using AiTesting.Application.Users.Services.RefreshToken;
 using AiTesting.Application.Users.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public static class DependencyInjection
         services.AddTransient<IPasswordHasher, PasswordHasher>();
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
         services.AddScoped<IUserProfileService, UserProfileService>();
 
         return services;
