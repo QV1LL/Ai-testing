@@ -89,3 +89,17 @@
 .primaryBtn:hover {
   background-color: #1d4ed8;
 }
+
+.dropZone {
+  border: dashed #d1d5db;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.previewImage {
+  max-height: 150px;
+}

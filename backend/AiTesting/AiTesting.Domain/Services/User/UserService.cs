@@ -1,4 +1,5 @@
 ﻿using AiTesting.Domain.Common;
+using AiTesting.Domain.Common.Specifications.User;
 using AiTesting.Domain.Repositories;
 
 namespace AiTesting.Domain.Services.User;
@@ -36,7 +37,7 @@ public class UserService : IUserService
 
     public async Task<Result<Models.User>> GetByIdAsync(Guid id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id, new UserWithTestsAndTestAttemptsSpecification());
 
         return user == null ? 
                Result<Models.User>.Failure("User not found") : 

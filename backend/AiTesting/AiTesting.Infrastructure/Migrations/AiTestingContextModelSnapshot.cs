@@ -143,16 +143,14 @@ namespace AiTesting.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamptz");
 
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
@@ -185,8 +183,9 @@ namespace AiTesting.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("FinishedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset?>("FinishedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz");
 
                     b.Property<Guid?>("GuestId")
                         .HasColumnType("uuid");
@@ -194,8 +193,9 @@ namespace AiTesting.Infrastructure.Migrations
                     b.Property<double>("Score")
                         .HasColumnType("double precision");
 
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz");
 
                     b.Property<Guid>("TestId")
                         .HasColumnType("uuid");
@@ -219,6 +219,10 @@ namespace AiTesting.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()

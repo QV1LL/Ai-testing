@@ -23,6 +23,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(u => u.AvatarUrl);
+
         builder.Property(u => u.Role)
             .IsRequired();
 

@@ -1,5 +1,6 @@
 ﻿using AiTesting.Application.Users.Dto.Profile;
 using AiTesting.Application.Users.Services.Profile;
+using AiTesting.Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,13 +21,11 @@ public class UsersController : ControllerBase
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            return Unauthorized(new { message = "Invalid token" });
+        var userIdResult = GetUserId();
+        if (userIdResult.IsFailure)
+            return Unauthorized(new { message = userIdResult.Error });
 
-        var userId = Guid.Parse(userIdClaim.Value);
-
-        var result = await _userProfileService.GetProfile(userId);
+        var result = await _userProfileService.GetProfile(userIdResult.Value);
 
         if (result.IsSuccess)
             return Ok(result.Value);
@@ -37,14 +36,16 @@ public class UsersController : ControllerBase
 
     [Authorize]
     [HttpPut("profile")]
-    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto, IFormFile? avatarImage)
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            return Unauthorized(new { message = "Invalid token" });
+        var userIdResult = GetUserId();
+        if (userIdResult.IsFailure)
+            return Unauthorized(new { message = userIdResult.Error });
 
-        var userId = Guid.Parse(userIdClaim.Value);
-        var result = await _userProfileService.UpdateProfile(userId, dto);
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _userProfileService.UpdateProfile(userIdResult.Value, dto, avatarImage, baseUrl);
 
         return result.IsSuccess ?
                NoContent() :
@@ -55,15 +56,23 @@ public class UsersController : ControllerBase
     [HttpDelete("profile")]
     public async Task<IActionResult> DeleteUser()
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            return Unauthorized(new { message = "Invalid token" });
+        var userIdResult = GetUserId();
+        if (userIdResult.IsFailure)
+            return Unauthorized(new { message = userIdResult.Error });
 
-        var userId = Guid.Parse(userIdClaim.Value);
-        var result = await _userProfileService.DeleteProfile(userId);
+        var result = await _userProfileService.DeleteProfile(userIdResult.Value);
 
         return result.IsSuccess ?
                NoContent() :
                BadRequest(new { message = result.Error });
+    }
+
+    private Result<Guid> GetUserId()
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Result<Guid>.Failure("Invalid token");
+
+        return Result<Guid>.Success(Guid.Parse(userIdClaim.Value));
     }
 }

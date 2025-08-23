@@ -3,6 +3,7 @@ using AiTesting.Domain.Repositories;
 using AiTesting.Infrastructure.Persistence.Repositories;
 using AiTesting.Infrastructure.Persistence.Repositories.Concreate;
 using AiTesting.Infrastructure.Persistence.Repositories.Contracts;
+using AiTesting.Infrastructure.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AiTesting.Infrastructure;
@@ -18,6 +19,8 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddTransient<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }

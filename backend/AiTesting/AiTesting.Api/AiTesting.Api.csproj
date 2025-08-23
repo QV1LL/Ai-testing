@@ -26,4 +26,8 @@
     <ProjectReference Include="..\AiTesting.Application\AiTesting.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="uploads\" />
+  </ItemGroup>
+
 </Project>

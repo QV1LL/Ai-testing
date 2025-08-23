@@ -66,6 +66,14 @@
   gap: 1.5rem;
 }
 
+.testsPlaceholder {
+  text-align: center;
+  color: #666;
+  font-weight: 400;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
 .testCard {
   background: white;
   border-radius: 12px;

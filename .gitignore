@@ -5,6 +5,8 @@
 
 Domain.txt
 
+uploads/
+
 # User-specific files
 *.rsuser
 *.suo

@@ -2,7 +2,10 @@
 
 public record UserDto(
     string Name,
-    string Email
+    string Email,
+    string AvatarUrl,
+    List<TestProfileDto> Tests,
+    List<TestAttemptProfileDto> TestAttempts
 )
 {
 }

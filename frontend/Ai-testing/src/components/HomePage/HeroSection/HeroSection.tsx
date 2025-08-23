@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => (
       <div className={styles.quickActions}>
         <button
           className="primary-btn"
-          onClick={() => (window.location.href = "/create-test")}
+          onClick={() => (window.location.href = "/tests/create")}
         >
           Create Test
         </button>

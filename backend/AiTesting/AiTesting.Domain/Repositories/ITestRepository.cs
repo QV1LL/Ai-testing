@@ -4,5 +4,5 @@ namespace AiTesting.Domain.Repositories;
 
 public interface ITestRepository : IRepository<Test>
 {
-
+    Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

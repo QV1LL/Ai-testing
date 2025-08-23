@@ -1,28 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import styles from "./MyTestsPage.module.css";
-
-interface Test {
-  id: string;
-  title: string;
-  description: string;
-}
+import { getUserTests } from "../../api/testService";
+import type { TestDto } from "../../types/test";
 
 const MyTestsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [allTests, setAllTests] = useState<TestDto[]>([]);
   const testsPerPage = 9;
 
-  const allTests: Test[] = [
-    { id: "1", title: "React Basics", description: "Learn React fundamentals" },
-    { id: "2", title: "TypeScript Advanced", description: "Deep dive into TS" },
-    { id: "3", title: "JavaScript Quiz", description: "Test JS knowledge" },
-    { id: "4", title: "HTML & CSS", description: "Build static pages" },
-    { id: "5", title: "Node.js Intro", description: "Backend basics" },
-    { id: "6", title: "Redux", description: "State management" },
-    { id: "7", title: "Unit Testing", description: "Learn testing in JS" },
-  ];
+  useEffect(() => {
+    const fetchTests = async () => {
+      const data = await getUserTests();
+      console.log("allTests:", allTests);
+      setAllTests(data);
+    };
+
+    fetchTests();
+  }, []);
 
   const filteredTests = allTests.filter((t) =>
     t.title.toLowerCase().includes(search.toLowerCase())
@@ -52,12 +49,18 @@ const MyTestsPage: React.FC = () => {
       <div className={styles.wrapper}>
         <div className={styles.container}>
           <div className={styles.testsList}>
-            {currentTests.map((t) => (
-              <div key={t.id} className={styles.testCard}>
-                <h3>{t.title}</h3>
-                <p>{t.description}</p>
-              </div>
-            ))}
+            {currentTests.length > 0 ? (
+              currentTests.map((t) => (
+                <div key={t.id} className={styles.testCard}>
+                  <h3>{t.title}</h3>
+                  <p>
+                    {t.description === null ? "no description" : t.description}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className={styles.testsPlaceholder}>No tests available yet.</p>
+            )}
           </div>
 
           <div className={styles.pagination}>

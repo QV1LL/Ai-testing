@@ -17,7 +17,6 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
             .HasMaxLength(200);
 
         builder.Property(t => t.Description)
-            .IsRequired()
             .HasMaxLength(2000);
 
         builder.Property(t => t.CoverImageUrl)
@@ -28,9 +27,13 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
 
         builder.Property(t => t.TimeLimitMinutes);
 
-        builder.Property<DateTime>("CreatedAt")
-            .HasDefaultValueSql("NOW()")
-            .ValueGeneratedOnAdd();
+        builder.Property(t => t.CreatedAt)
+            .HasColumnType("timestamptz")
+            .ValueGeneratedOnAdd()
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v.DateTime, DateTimeKind.Utc)
+            );
 
         builder.Property<DateTime>("UpdatedAt")
             .HasDefaultValueSql("NOW()")

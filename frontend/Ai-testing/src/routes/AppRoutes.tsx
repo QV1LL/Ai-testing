@@ -2,13 +2,14 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "../pages/HomePage/HomePage";
 import AboutPage from "../pages/AboutPage/AboutPage";
-import DocumentationPage from "../pages/DocumantationPage/DocumentationPage";
+import DocumentationPage from "../pages/DocumentationPage/DocumentationPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage/PrivacyPolicyPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import MyTestsPage from "../pages/MyTestsPage/MyTestsPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import PrivateRoute from "../routes/PrivateRoute";
 import AuthPage from "../pages/AuthPage/AuthPage";
+import CreateTestPage from "../pages/CreateTestPage/CreateTestPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +34,14 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <MyTestsPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/tests/create"
+        element={
+          <PrivateRoute>
+            <CreateTestPage />
           </PrivateRoute>
         }
       />

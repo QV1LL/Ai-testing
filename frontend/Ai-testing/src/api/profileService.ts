@@ -8,7 +8,20 @@ export const getProfile = async (): Promise<ProfileDto> => {
 
 export const updateProfile = async (dto: UpdateProfileDto): Promise<void> => {
   try {
-    await api.put("/users/profile", dto);
+    const formData = new FormData();
+
+    formData.append("name", dto.name);
+    formData.append("email", dto.email);
+
+    if (dto.avatarImage) {
+      formData.append("avatarImage", dto.avatarImage);
+    }
+
+    await api.put("/users/profile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message ?? "Failed to update profile";

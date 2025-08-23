@@ -180,6 +180,7 @@
     gap: var(--profile-items-gap) / 2;
     box-shadow: none;
     flex-direction: column;
+    margin: 0 2rem;
   }
 
   .wrapper {

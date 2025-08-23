@@ -13,10 +13,10 @@ public class GenericRepository<T> : IRepository<T> where T : class
         DbContext = dbContext;
     }
 
-    public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public virtual async Task<T?> GetByIdAsync(Guid id, ISpecification<T> specification, CancellationToken cancellationToken = default)
     {
-        return await DbContext.Set<T>()
-                              .FindAsync([id], cancellationToken: cancellationToken);
+        var query = ApplySpecification(specification);
+        return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, cancellationToken);
     }
 
     public virtual async Task<IReadOnlyList<T>> ListAsync(CancellationToken cancellationToken = default)
@@ -60,6 +60,11 @@ public class GenericRepository<T> : IRepository<T> where T : class
 
     protected IQueryable<T> ApplySpecification(ISpecification<T> specification)
     {
-        return specification.Apply(DbContext.Set<T>().AsQueryable());
+        IQueryable<T> entities = DbContext.Set<T>();
+
+        foreach (var include in specification.Includes)
+            entities = entities.Include(include);
+
+        return entities;
     }
 }

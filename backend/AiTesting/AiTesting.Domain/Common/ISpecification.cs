@@ -1,6 +1,8 @@
-﻿namespace AiTesting.Domain.Common;
+﻿using System.Linq.Expressions;
+
+namespace AiTesting.Domain.Common;
 
 public interface ISpecification<T>
 {
-    IQueryable<T> Apply(IQueryable<T> query);
+    List<Expression<Func<T, object>>> Includes { get; }
 }

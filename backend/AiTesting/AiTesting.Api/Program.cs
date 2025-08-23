@@ -3,6 +3,7 @@ using AiTesting.Domain;
 using AiTesting.Infrastructure;
 using AiTesting.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -44,7 +45,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://192.168.1.105:5173")
+            policy.WithOrigins("http://192.168.1.107:5173")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -63,7 +64,14 @@ using(var scope = app.Services.CreateScope())
     await scope.ServiceProvider.GetRequiredService<DbContext>().Database.EnsureCreatedAsync();
 }
 
-app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
+
+//app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

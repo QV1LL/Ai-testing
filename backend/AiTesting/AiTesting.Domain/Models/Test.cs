@@ -17,29 +17,34 @@ public class Test
         }
     }
 
-    public string Description
+    public string? Description { get; set; }
+    public string CoverImageUrl { get; set; }
+    public User CreatedBy { get; private set; }
+    public Guid CreatedById { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public bool IsPublic { get; set; }
+    public List<Question> Questions { get; private set; } = [];
+    public List<TestAttempt> TestAttempts { get; private set; } = [];
+    public int? TimeLimitMinutes
     {
         get => field;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Description cannot be empty");
+            if (value == null)
+                return;
+
+            if (value <= 0)
+                throw new ArgumentException("Time limit must be greater than 0 minutes");
+
             field = value;
         }
     }
-    public string CoverImageUrl { get; private set; }
-    public User CreatedBy { get; private set; }
-    public Guid CreatedById { get; private set; }
-    public bool IsPublic { get; private set; }
-    public List<Question> Questions { get; private set; } = [];
-    public List<TestAttempt> TestAttempts { get; private set; } = [];
-    public int? TimeLimitMinutes { get; private set; }
 
     protected Test() { }
 
     private Test(Guid id, 
                  string title, 
-                 string description, 
+                 string? description, 
                  string coverImageUrl, 
                  User createdBy, 
                  bool isPublic, 
@@ -50,12 +55,13 @@ public class Test
         Description = description;
         CoverImageUrl = coverImageUrl;
         CreatedBy = createdBy;
+        CreatedAt = DateTime.Now;
         IsPublic = isPublic;
         TimeLimitMinutes = timeLimitMinutes;
     }
 
     public static Result<Test> Create(string title, 
-                                      string description, 
+                                      string? description, 
                                       User createdBy, 
                                       bool isPublic, 
                                       string coverImageUrl = null!, 

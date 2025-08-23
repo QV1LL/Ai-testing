@@ -4,7 +4,7 @@ namespace AiTesting.Domain.Repositories;
 
 public interface IRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<T?> GetByIdAsync(Guid id, ISpecification<T> specification, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<T>> ListAsync(CancellationToken cancellationToken = default);
 

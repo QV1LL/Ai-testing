@@ -13,9 +13,21 @@ public class TestAttemptConfiguration : IEntityTypeConfiguration<TestAttempt>
         builder.HasKey(a => a.Id);
 
         builder.Property(a => a.StartedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamptz")
+            .ValueGeneratedOnAdd()
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v.DateTime, DateTimeKind.Utc)
+            );
 
-        builder.Property(a => a.FinishedAt);
+        builder.Property(a => a.FinishedAt)
+            .HasColumnType("timestamptz")
+            .ValueGeneratedOnAdd()
+            .HasConversion(
+                v => v.HasValue ? v.Value.ToUniversalTime() : v,
+                v => DateTime.SpecifyKind(v.HasValue ? v.Value.DateTime : DateTime.Now, DateTimeKind.Utc)
+            );
 
         builder.Property(a => a.Score)
             .IsRequired();

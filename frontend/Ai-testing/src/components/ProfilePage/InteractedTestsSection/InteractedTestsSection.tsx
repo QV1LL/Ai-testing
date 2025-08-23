@@ -1,22 +1,26 @@
 import React from "react";
 import styles from "./InteractedTestsSection.module.css";
-
-interface Test {
-  id: string;
-  title: string;
-  date: string;
-  score?: number;
-}
+import type { TestAttemptsInfo, TestInfo } from "../../../types/profile";
 
 interface InteractedTestsSectionProps {
-  createdTests?: Test[];
-  passedTests?: Test[];
+  createdTests?: TestInfo[];
+  passedTests?: TestAttemptsInfo[];
 }
 
 const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
   createdTests = [],
   passedTests = [],
 }) => {
+  const formatLocalDateTime = (dateInput: string | Date) => {
+    const date =
+      typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+    return `${String(date.getDate()).padStart(2, "0")}.${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}.${date.getFullYear()} ${String(
+      date.getHours()
+    ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  };
+
   return (
     <div className={styles.testsSection}>
       {/* Created Tests */}
@@ -35,7 +39,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
               {createdTests.map((test) => (
                 <tr key={test.id}>
                   <td>{test.title}</td>
-                  <td>{test.date}</td>
+                  <td>{formatLocalDateTime(test.createdAt)}</td>
                   <td>
                     <button className="secondary-btn">Edit</button>
                   </td>
@@ -44,7 +48,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
             </tbody>
           </table>
         ) : (
-          <p>No tests created yet.</p>
+          <p className={styles.testsPlaceholder}>No tests created yet.</p>
         )}
       </div>
 
@@ -64,14 +68,14 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
               {passedTests.map((test) => (
                 <tr key={test.id}>
                   <td>{test.title}</td>
-                  <td>{test.date}</td>
+                  <td>{formatLocalDateTime(test.startedAt)}</td>
                   <td>{test.score ?? "-"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p>No tests passed yet.</p>
+          <p className={styles.testsPlaceholder}>No tests passed yet.</p>
         )}
       </div>
     </div>

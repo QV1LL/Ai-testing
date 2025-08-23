@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
               <a href="/tests">Tests</a>
             </li>
             <li>
-              <a href="/create">Create a Test</a>
+              <a href="/tests/create">Create a Test</a>
             </li>
             <li>
               <a href="/attempt">Attempt by ID</a>

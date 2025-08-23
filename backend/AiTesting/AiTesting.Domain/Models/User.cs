@@ -49,7 +49,7 @@ public class User : IUser
             field = value;
         }
     }
-
+    public string AvatarUrl { get; set; } = string.Empty;
     public UserRole Role { get; private set; }
     public List<Test> Tests { get; private set; } = [];
     public List<TestAttempt> TestAttempts { get; private set; } = [];

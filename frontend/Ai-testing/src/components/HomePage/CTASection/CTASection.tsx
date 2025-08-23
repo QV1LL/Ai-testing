@@ -9,7 +9,7 @@ const CTASection: React.FC = () => (
     </p>
     <button
       className="primary-btn"
-      onClick={() => (window.location.href = "/create-test")}
+      onClick={() => (window.location.href = "/tests/create")}
     >
       Start Now
     </button>

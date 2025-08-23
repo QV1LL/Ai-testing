@@ -3,7 +3,8 @@ import styles from "./ProfileCardSection.module.css";
 interface ProfileCardProps {
   name: string;
   email: string;
-  avatarUrl?: string;
+  avatarUrl: string;
+  isLoaded: boolean;
   onEditButtonClick: () => void;
   onLogOutButtonClick: () => void;
   onDeleteButtonClick: () => void;
@@ -13,6 +14,7 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
   name,
   email,
   avatarUrl,
+  isLoaded,
   onEditButtonClick,
   onLogOutButtonClick,
   onDeleteButtonClick,
@@ -22,7 +24,7 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
       <div className={styles.container}>
         <div className={styles.profileCard}>
           <div className={styles.avatarWrapper}>
-            {avatarUrl ? (
+            {avatarUrl !== "" ? (
               <img
                 src={avatarUrl}
                 alt="User Avatar"
@@ -44,18 +46,21 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
               <button
                 className="primary-btn"
                 onClick={() => onEditButtonClick()}
+                disabled={!isLoaded}
               >
                 Edit Profile
               </button>
               <button
                 onClick={() => onLogOutButtonClick()}
                 className={`${styles.secondaryBtn} secondary-btn`}
+                disabled={!isLoaded}
               >
                 Logout
               </button>
               <button
                 onClick={() => onDeleteButtonClick()}
                 className={`${styles.deleteBtn}`}
+                disabled={!isLoaded}
               >
                 Delete Profile
               </button>

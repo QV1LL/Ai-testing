@@ -11,8 +11,8 @@ public class TestAttempt
     public Guid? GuestId { get; private set; }
     public Test Test { get; private set; }
     public Guid TestId { get; private set; }
-    public DateTime StartedAt { get; private set; }
-    public DateTime? FinishedAt { get; private set; }
+    public DateTimeOffset StartedAt { get; private set; }
+    public DateTimeOffset? FinishedAt { get; private set; }
     public double Score { get; private set; }
     public List<AttemptAnswer> Answers { get; private set; } = new();
 
