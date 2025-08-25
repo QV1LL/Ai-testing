@@ -36,7 +36,7 @@ public class AnswerOption
 
     public static Result<AnswerOption> Create(Question question, 
                                               string text, 
-                                              string imageUrl = null)
+                                              string imageUrl = "")
     {
         try
         {

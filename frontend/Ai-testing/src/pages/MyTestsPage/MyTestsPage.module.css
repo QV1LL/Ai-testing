@@ -25,15 +25,6 @@
   justify-content: center;
 }
 
-.coloredBackground {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a6fa1 100%);
-}
-
-.filterContainer {
-  max-width: var(--content-max-width);
-  flex: 1;
-}
-
 .container {
   max-width: var(--content-max-width);
   flex: 1;
@@ -41,6 +32,15 @@
   flex-direction: column;
   justify-content: space-between;
   gap: var(--items-gap);
+}
+
+.coloredBackground {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a6fa1 100%);
+}
+
+.filterContainer {
+  max-width: var(--content-max-width);
+  flex: 1;
 }
 
 /* Search and Filters */

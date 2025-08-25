@@ -1,7 +1,7 @@
 ﻿namespace AiTesting.Application.Tests.Dto.Managing;
 
-public record TestDto(
+public record AnswerOptionDto(
     Guid Id,
-    string Title,
-    string? Description
+    string Text,
+    string? ImageUrl
 );

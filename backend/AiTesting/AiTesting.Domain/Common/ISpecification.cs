@@ -1,8 +1,6 @@
-﻿using System.Linq.Expressions;
-
-namespace AiTesting.Domain.Common;
+﻿namespace AiTesting.Domain.Common;
 
 public interface ISpecification<T>
 {
-    List<Expression<Func<T, object>>> Includes { get; }
+    List<string> Includes { get; }
 }

@@ -6,6 +6,4 @@ public record AuthResultDto(
     Guid UserId,
     string DisplayName,
     string Email
-)
-{
-}
+);

@@ -60,7 +60,10 @@ public class UsersController : ControllerBase
         if (userIdResult.IsFailure)
             return Unauthorized(new { message = userIdResult.Error });
 
-        var result = await _userProfileService.DeleteProfile(userIdResult.Value);
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _userProfileService.DeleteProfile(userIdResult.Value, baseUrl);
 
         return result.IsSuccess ?
                NoContent() :

@@ -79,6 +79,8 @@ public class AuthService : IAuthService
         var accessToken = GenerateJwtToken(user);
         var refreshToken = existingRefreshToken ?? Infrastructure.Persistence.Entities.RefreshToken.Create(user);
 
+        if (refreshToken.IsExpired()) refreshToken.Refresh();
+
         await _refreshTokenService.SaveAsync(refreshToken);
 
         var resultDto = new AuthResultDto(

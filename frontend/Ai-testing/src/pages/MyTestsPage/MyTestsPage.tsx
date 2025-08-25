@@ -4,17 +4,19 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./MyTestsPage.module.css";
 import { getUserTests } from "../../api/testService";
 import type { TestDto } from "../../types/test";
+import { useNavigate } from "react-router-dom";
 
 const MyTestsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [allTests, setAllTests] = useState<TestDto[]>([]);
   const testsPerPage = 9;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTests = async () => {
       const data = await getUserTests();
-      console.log("allTests:", allTests);
+      console.log("allTests:", data);
       setAllTests(data);
     };
 
@@ -51,7 +53,12 @@ const MyTestsPage: React.FC = () => {
           <div className={styles.testsList}>
             {currentTests.length > 0 ? (
               currentTests.map((t) => (
-                <div key={t.id} className={styles.testCard}>
+                <div
+                  key={t.id}
+                  className={styles.testCard}
+                  onClick={() => navigate(`/tests/view/${t.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <h3>{t.title}</h3>
                   <p>
                     {t.description === null ? "no description" : t.description}

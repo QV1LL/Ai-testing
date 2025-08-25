@@ -47,7 +47,7 @@ public class Question
                                           QuestionType type, 
                                           string text, 
                                           int order, 
-                                          string imageUrl = null)
+                                          string imageUrl = "")
     {
         try
         {

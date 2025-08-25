@@ -10,6 +10,8 @@ import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import PrivateRoute from "../routes/PrivateRoute";
 import AuthPage from "../pages/AuthPage/AuthPage";
 import CreateTestPage from "../pages/CreateTestPage/CreateTestPage";
+import EditTestPage from "../pages/EditTestPage/EditTestPage";
+import ViewTestPage from "../pages/ViewTestPage/ViewTestPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -42,6 +44,22 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <CreateTestPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/tests/edit/:id"
+        element={
+          <PrivateRoute>
+            <EditTestPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/tests/view/:id"
+        element={
+          <PrivateRoute>
+            <ViewTestPage />
           </PrivateRoute>
         }
       />

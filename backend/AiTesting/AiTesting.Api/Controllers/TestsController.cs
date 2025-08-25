@@ -37,6 +37,35 @@ public class TestsController : ControllerBase
     }
 
     [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id )
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _testManageService.Delete(id, ownerIdResult.Value, baseUrl);
+
+        return result.IsSuccess ?
+                NoContent() :
+                BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(Guid id)
+    {
+        var result = await _testManageService.Get(id);
+
+        if (result.IsFailure) return NotFound(result.Error);
+
+        return Ok(result.Value);
+    }
+
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetUserTests()
     {

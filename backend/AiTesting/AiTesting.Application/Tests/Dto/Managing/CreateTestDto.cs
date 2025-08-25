@@ -6,6 +6,4 @@ public record CreateTestDto
     string? Description,
     bool IsPublic,
     int? TimeLimitMinutes
-)
-{
-}
+);

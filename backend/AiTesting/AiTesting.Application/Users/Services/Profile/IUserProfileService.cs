@@ -8,5 +8,5 @@ public interface IUserProfileService
 {
     Task<Result<UserDto>> GetProfile(Guid id);
     Task<Result> UpdateProfile(Guid id, UpdateProfileDto dto, IFormFile? avatarImage, string apiUrl);
-    Task<Result> DeleteProfile(Guid id);
+    Task<Result> DeleteProfile(Guid id, string apiUrl);
 }

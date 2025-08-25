@@ -20,8 +20,13 @@ public class UserProfileService : IUserProfileService
         _fileStorageService = fileStorageService;
     }
 
-    public async Task<Result> DeleteProfile(Guid id)
+    public async Task<Result> DeleteProfile(Guid id, string apiUrl)
     {
+        var userResult = await _userService.GetByIdAsync(id);
+
+        if (userResult.IsFailure) return userResult;
+
+        await _fileStorageService.DeleteFileAsync(userResult.Value.AvatarUrl.Replace(apiUrl, string.Empty));
         return await _userService.DeleteAsync(id);
     }
 

@@ -5,6 +5,4 @@ public record CreateTestResultDto
     Guid Id,
     string Title,
     string Description
-)
-{
-}
+);

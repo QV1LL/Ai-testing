@@ -1,5 +1,4 @@
 import axios from "axios";
-import { logout } from "./authService";
 import type { LoginResult } from "../types/user";
 
 export const ACCESS_TOKEN_KEY = "access_token";
@@ -43,14 +42,8 @@ api.interceptors.response.use(
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
-        } else {
-          console.log("Log out");
-          logout();
         }
-      } catch {
-        console.log("Log out with exception");
-        logout();
-      }
+      } catch {}
     }
 
     return Promise.reject(error);

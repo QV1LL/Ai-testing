@@ -88,17 +88,20 @@
     position: absolute;
     top: 100%;
     left: 0;
-    gap: 0;
+    gap: 0.5rem;
     right: 0;
     flex-direction: column;
     background-color: #1e293b;
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.3s ease;
+    transform: translateY(-20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
   .navLinks.open {
-    max-height: 500px;
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .navLinks a {

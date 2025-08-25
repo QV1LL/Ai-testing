@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./InteractedTestsSection.module.css";
 import type { TestAttemptsInfo, TestInfo } from "../../../types/profile";
+import { useNavigate } from "react-router-dom";
 
 interface InteractedTestsSectionProps {
   createdTests?: TestInfo[];
@@ -11,6 +12,8 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
   createdTests = [],
   passedTests = [],
 }) => {
+  const navigate = useNavigate();
+
   const formatLocalDateTime = (dateInput: string | Date) => {
     const date =
       typeof dateInput === "string" ? new Date(dateInput) : dateInput;
@@ -41,7 +44,12 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
                   <td>{test.title}</td>
                   <td>{formatLocalDateTime(test.createdAt)}</td>
                   <td>
-                    <button className="secondary-btn">Edit</button>
+                    <button
+                      className="secondary-btn"
+                      onClick={() => navigate(`/tests/view/${test.id}`)}
+                    >
+                      View
+                    </button>
                   </td>
                 </tr>
               ))}

@@ -4,7 +4,7 @@ public class UserWithTestsAndTestAttemptsSpecification : DefaultSpecification<Mo
 {
     public UserWithTestsAndTestAttemptsSpecification()
     {
-        AddInclude(u => u.Tests);
-        AddInclude(u => u.TestAttempts);
+        AddInclude("Tests");
+        AddInclude("TestAttempts");
     }
 }
