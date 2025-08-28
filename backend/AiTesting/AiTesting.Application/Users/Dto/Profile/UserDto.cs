@@ -6,6 +6,4 @@ public record UserDto(
     string AvatarUrl,
     List<TestProfileDto> Tests,
     List<TestAttemptProfileDto> TestAttempts
-)
-{
-}
+);

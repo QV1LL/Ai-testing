@@ -1,7 +1,11 @@
 import type {
+  AnswerOptionDto,
   CreateTestDto,
   FullTestDto,
+  QuestionDto,
   TestDto,
+  UpdateOptionImageDto,
+  UpdateQuestionImageDto,
   UpdateQuestionsDto,
   UpdateTestMetadataDto,
   UserTestsResultDto,
@@ -60,15 +64,90 @@ export const updateTestData = async (
   if (dto.description) formData.append("description", dto.description);
   if (dto.coverImage) formData.append("coverImage", dto.coverImage);
 
-  await api.put(`/tests/${dto.id}/metadata`, formData, {
+  await api.put(`/tests/metadata`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-export const updateTestQuestions = async (
+export const updateTestQuestionsWithImages = async (
   dto: UpdateQuestionsDto
 ): Promise<void> => {
-  await api.put(`/tests/${dto.testId}/questions`, dto);
+  const dtoWithoutFiles = {
+    ...dto,
+    questionsToAdd: dto.questionsToAdd.map((q) => ({
+      ...q,
+      imageFile: undefined,
+      options: q.options.map((o) => ({ ...o, imageFile: undefined })),
+    })),
+    questionsToUpdate: dto.questionsToUpdate.map((q) => ({
+      ...q,
+      imageFile: undefined,
+      options: q.options.map((o) => ({ ...o, imageFile: undefined })),
+    })),
+  };
+
+  await api.put("/tests/questions", dtoWithoutFiles);
+
+  const uploadPromises: Promise<void>[] = [];
+
+  const handleQuestionImages = (question: QuestionDto) => {
+    if (question.imageFile) {
+      const qDto: UpdateQuestionImageDto = {
+        testId: dto.testId,
+        id: question.id,
+        imageFile: question.imageFile,
+      };
+      uploadPromises.push(updateQuestionImage(qDto));
+    }
+
+    question.options.forEach((option: AnswerOptionDto) => {
+      if (option.imageFile) {
+        const oDto: UpdateOptionImageDto = {
+          testId: dto.testId,
+          questionId: question.id,
+          id: option.id,
+          imageFile: option.imageFile,
+        };
+        uploadPromises.push(updateOptionImage(oDto));
+      }
+    });
+  };
+
+  dto.questionsToAdd.forEach(handleQuestionImages);
+  dto.questionsToUpdate.forEach(handleQuestionImages);
+
+  await Promise.all(uploadPromises);
+};
+
+export const updateQuestionImage = async (
+  dto: UpdateQuestionImageDto
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append("testId", dto.testId);
+  formData.append("id", dto.id);
+  if (dto.imageFile) {
+    formData.append("imageFile", dto.imageFile);
+  }
+
+  await api.post("/tests/question/image", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+export const updateOptionImage = async (
+  dto: UpdateOptionImageDto
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append("testId", dto.testId);
+  formData.append("questionId", dto.questionId);
+  formData.append("id", dto.id);
+  if (dto.imageFile) {
+    formData.append("imageFile", dto.imageFile);
+  }
+
+  await api.post("/tests/question/option/image", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 export const getUserTests = async (): Promise<TestDto[]> => {

@@ -5,7 +5,7 @@
 .header {
   margin: 0 auto;
   max-width: var(--content-max-width);
-  z-index: 1000;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -53,7 +53,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 10;
 }
 
 .menuToggle span {

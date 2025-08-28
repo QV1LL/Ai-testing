@@ -1,5 +1,6 @@
 ﻿using AiTesting.Application.Tests.Dto.Managing;
 using AiTesting.Domain.Common;
+using AiTesting.Domain.Enums;
 using AiTesting.Domain.Models;
 using AiTesting.Domain.Services.Test;
 using AiTesting.Domain.Services.User;
@@ -16,6 +17,8 @@ internal class TestManageService : ITestManageService
     private readonly IFileStorageService _fileStorageService;
 
     private const string COVER_IMAGES_SUBFOLDER = "tests/coverImages";
+    private const string QUESTIONS_IMAGES_SUBFOLDER = "tests/questions";
+    private const string OPTIONS_IMAGES_SUBFOLDER = "tests/options";
 
     public TestManageService(IUserService userService,
                              ITestService testService,
@@ -130,6 +133,131 @@ internal class TestManageService : ITestManageService
         return Result<CreateTestResultDto>.Success(createTestResult);
     }
 
+    public async Task<Result> UpdateMetadata(UpdateTestMetadataDto dto, Guid ownerId, string apiUrl)
+    {
+        var testResult = await _testService.GetByIdAsync(dto.Id);
+
+        if (testResult.IsFailure) return testResult;
+
+        var test = testResult.Value;
+        
+        if (test.CreatedById != ownerId) return Result.Failure("Cannot update test that doesn`t belong to this user");
+
+        var coverImageUrlResult = await _fileStorageService.UploadFileAsync(dto.CoverImage, COVER_IMAGES_SUBFOLDER);
+        var coverImageUrl = coverImageUrlResult.IsSuccess ?
+                            coverImageUrlResult.Value :
+                            string.Empty;
+
+        try
+        {
+            test.Title = dto.Title;
+            test.Description = dto.Description;
+            test.TimeLimitMinutes = dto.TimeLimitInMinutes;
+            test.IsPublic = dto.IsPublic;
+            
+            if (coverImageUrlResult.IsSuccess)
+            {
+                var oldCoverImageRelativeUrl = test.CoverImageUrl.Replace(apiUrl, string.Empty);
+                test.CoverImageUrl = $"{apiUrl}{coverImageUrl}";
+                await _fileStorageService.DeleteFileAsync(oldCoverImageRelativeUrl);
+            }
+
+            return await _testService.UpdateAsync(test);
+        }
+        catch (ArgumentException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
+    }
+
+    public async Task<Result> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId)
+    {
+        var testResult = await _testService.GetByIdAsync(dto.TestId);
+
+        if (testResult.IsFailure) return testResult;
+
+        var test = testResult.Value;
+
+        if (test.CreatedById != ownerId) return Result.Failure("Cannot update test that doesn`t belong to this user");
+
+        var questionsToAdd = dto.QuestionsToAdd.Select(
+            qdto => UpdateQuestionDtoToQuestion(qdto, test)
+        );
+
+        var questionsToUpdate = dto.QuestionsToUpdate.Select(
+            qdto => UpdateQuestionDtoToQuestion(qdto, test)
+        );
+
+        return await _testService.UpdateTestQuestionsAsync(
+            test,
+            questionsToAdd,
+            questionsToUpdate,
+            dto.QuestionsToDeleteIds
+        );
+    }
+
+    public async Task<Result> UpdateQuestionImage(UpdateQuestionImageDto dto, Guid ownerId, string apiUrl)
+    {
+        var testResult = await _testService.GetByIdAsync(dto.TestId);
+
+        if (testResult.IsFailure) return testResult;
+
+        var test = testResult.Value;
+
+        if (test.CreatedById != ownerId) 
+            return Result.Failure("Cannot modify test that doesnt belong to this user");
+
+        var question = test.Questions.FirstOrDefault(q => q.Id == dto.Id);
+
+        if (question == null) 
+            return Result.Failure("Question not found");
+
+        var questionImageUrlResult = await _fileStorageService.UploadFileAsync(dto.ImageFile, QUESTIONS_IMAGES_SUBFOLDER);
+        var questionImageUrl = questionImageUrlResult.IsSuccess ? questionImageUrlResult.Value : string.Empty;
+
+        if (questionImageUrlResult.IsSuccess)
+        {
+            var oldImageRelativeUrl = test.CoverImageUrl.Replace(apiUrl, string.Empty);
+            question.ImageUrl = $"{apiUrl}{questionImageUrl}";
+            await _fileStorageService.DeleteFileAsync(oldImageRelativeUrl);
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> UpdateOptionImage(UpdateOptionImageDto dto, Guid ownerId, string apiUrl)
+    {
+        var testResult = await _testService.GetByIdAsync(dto.TestId);
+
+        if (testResult.IsFailure)
+            return testResult;
+
+        var test = testResult.Value;
+
+        if (test.CreatedById != ownerId)
+            return Result.Failure("Cannot modify test that doesn't belong to this user");
+
+        var question = test.Questions.FirstOrDefault(q => q.Id == dto.QuestionId);
+        if (question == null)
+            return Result.Failure("Question not found");
+
+        var option = question.Options.FirstOrDefault(o => o.Id == dto.Id);
+        if (option == null)
+            return Result.Failure("Option not found");
+
+        var optionImageUrlResult = await _fileStorageService.UploadFileAsync(dto.ImageFile, OPTIONS_IMAGES_SUBFOLDER);
+        var optionImageUrl = optionImageUrlResult.IsSuccess ? optionImageUrlResult.Value : string.Empty;
+
+        if (optionImageUrlResult.IsSuccess)
+        {
+            var oldImageRelativeUrl = option.ImageUrl.Replace(apiUrl, string.Empty);
+            option.ImageUrl = $"{apiUrl}{optionImageUrl}";
+            await _fileStorageService.DeleteFileAsync(oldImageRelativeUrl);
+        }
+
+        return Result.Success();
+    }
+
     public async Task<Result> Delete(Guid testId, Guid ownerId, string apiUrl)
     {
         var testToDeleteResult = await _testService.GetByIdAsync(testId);
@@ -156,5 +284,60 @@ internal class TestManageService : ITestManageService
         var result = await _testService.DeleteAsync(testId);
 
         return result;
+    }
+
+    private static Question UpdateQuestionDtoToQuestion(UpdateQuestionDto dto, Test test)
+    {
+        var questionResult = Question.Create(
+            test,
+            dto.Type,
+            dto.Text,
+            dto.Order,
+            dto.CorrectTextAnswer ?? "",
+            "" 
+        );
+
+        if (questionResult.IsFailure)
+            throw new InvalidOperationException($"Cannot create question: {questionResult.Error}");
+
+        var question = questionResult.Value;
+
+        if (dto.Options != null && dto.Options.Any())
+        {
+            foreach (var optionDto in dto.Options)
+            {
+                var existingOption = question.Options.FirstOrDefault(o => o.Id == optionDto.Id);
+
+                if (existingOption != null)
+                {
+                    existingOption.Text = optionDto.Text;
+                }
+                else
+                {
+                    var newOptionResult = AnswerOption.Create(
+                        question,
+                        optionDto.Text,
+                        "" 
+                    );
+
+                    if (newOptionResult.IsSuccess)
+                        question.AddOption(newOptionResult.Value);
+                }
+            }
+        }
+
+        if (dto.CorrectAnswers != null && dto.CorrectAnswers.Any() && question.Type != QuestionType.OpenEnded)
+        {
+            var correctOptions = question.Options
+                .Where(o => dto.CorrectAnswers.Any(co => co.Id == o.Id))
+                .ToList();
+
+            question.SetCorrectAnswers(correctOptions);
+        }
+
+        if (question.Type == QuestionType.OpenEnded)
+            question.SetCorrectTextAnswer(dto.CorrectTextAnswer);
+
+        return question;
     }
 }

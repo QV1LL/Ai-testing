@@ -21,9 +21,10 @@ public class Question
         }
     }
 
-    public string ImageUrl { get; private set; }
+    public string ImageUrl { get; set; }
     public List<AnswerOption> Options { get; private set; } = [];
     public List<AnswerOption> CorrectAnswers { get; private set; } = [];
+    public string? CorrectTextAnswer { get; private set; }
     public int Order { get; private set; }
 
     protected Question() { }
@@ -32,7 +33,8 @@ public class Question
                      Test test, 
                      QuestionType type, 
                      string text, 
-                     string imageUrl, 
+                     string imageUrl,
+                     string? correctTextAnswer,
                      int order)
     {
         Id = id;
@@ -40,6 +42,7 @@ public class Question
         Type = type;
         Text = text;
         ImageUrl = imageUrl;
+        CorrectTextAnswer = correctTextAnswer;
         Order = order;
     }
 
@@ -47,12 +50,13 @@ public class Question
                                           QuestionType type, 
                                           string text, 
                                           int order, 
+                                          string? correctTextAnswer = null,
                                           string imageUrl = "")
     {
         try
         {
             return Result<Question>.Success(
-                new Question(Guid.NewGuid(), test, type, text, imageUrl, order)
+                new Question(Guid.NewGuid(), test, type, text, imageUrl, correctTextAnswer, order)
                 );
         }
         catch (ArgumentException ex)
@@ -70,8 +74,54 @@ public class Question
 
     public Result SetCorrectAnswers(IEnumerable<AnswerOption> correctAnswers)
     {
-        if (correctAnswers == null) return Result.Failure("Correct answers cannot be null");
+        if (Type == QuestionType.OpenEnded)
+            return Result.Failure("Open answer questions cannot have option-based correct answers");
+
+        if (correctAnswers == null || !correctAnswers.Any())
+            return Result.Failure("Correct answers cannot be empty");
+
+        var invalidAnswers = correctAnswers
+            .Where(a => !Options.Any(o => o.Id == a.Id))
+            .ToList();
+
+        if (invalidAnswers.Count != 0)
+            return Result.Failure("Some correct answers are not part of the question options");
+
+        CorrectAnswers.Clear();
         CorrectAnswers.AddRange(correctAnswers);
+
         return Result.Success();
+    }
+
+    public Result SetCorrectTextAnswer(string? correctAnswer)
+    {
+        if (Type != QuestionType.OpenEnded)
+            return Result.Failure("Only open answer questions can have a text answer");
+
+        CorrectTextAnswer = correctAnswer;
+        return Result.Success();
+    }
+
+    public Result Update(
+        string text,
+        int order,
+        string imageUrl,
+        QuestionType type,
+        string? correctTextAnswer = null)
+    {
+        try
+        {
+            Text = text;
+            CorrectTextAnswer = correctTextAnswer;
+            Order = order;
+            ImageUrl = imageUrl;
+            Type = type;
+
+            return Result.Success();
+        }
+        catch (ArgumentException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
     }
 }

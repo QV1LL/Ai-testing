@@ -1,0 +1,81 @@
+.testHeader {
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  padding-bottom: 3rem;
+  gap: 1rem;
+}
+
+.titleInput {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  background: transparent;
+  border: none;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  width: 90%;
+}
+
+.descriptionInput {
+  font-size: 1rem;
+  color: white;
+  background: transparent;
+  border: none;
+  text-align: center;
+  width: 90%;
+  resize: none;
+}
+
+.dropZone {
+  border: dashed #d1d5db;
+  height: 40px;
+  width: 40%;
+  color: #d1d5db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.overlayFooter {
+  position: absolute;
+  bottom: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.saveButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: rgba(117, 117, 117, 0.267);
+  color: rgb(252, 252, 252);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
+}
+
+.saveButton:hover,
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}

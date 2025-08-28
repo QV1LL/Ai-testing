@@ -3,6 +3,4 @@
 public record UpdateProfileDto(
     string Name,
     string Email
-)
-{
-}
+);

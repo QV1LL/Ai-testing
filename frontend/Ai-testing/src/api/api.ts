@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { LoginResult } from "../types/user";
+import { logout } from "./profileService";
 
 export const ACCESS_TOKEN_KEY = "access_token";
 export const REFRESH_TOKEN_KEY = "refresh_token";
@@ -73,6 +74,7 @@ export const refreshToken = async (): Promise<string | null> => {
     return accessToken ?? null;
   } catch (error) {
     console.error("Refresh token failed", error);
+    logout();
     return null;
   }
 };

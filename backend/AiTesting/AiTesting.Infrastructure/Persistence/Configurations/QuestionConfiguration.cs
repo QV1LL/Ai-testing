@@ -25,6 +25,9 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.Property(q => q.Order)
             .IsRequired();
 
+        builder.Property(q => q.CorrectTextAnswer)
+            .IsRequired(false);
+
         builder.HasOne(q => q.Test)
             .WithMany(t => t.Questions)
             .HasForeignKey(q => q.TestId)

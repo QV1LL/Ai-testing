@@ -5,6 +5,4 @@ public record TestAttemptProfileDto(
     string Title,
     DateTimeOffset StartedAt,
     double Score
-)
-{
-}
+);

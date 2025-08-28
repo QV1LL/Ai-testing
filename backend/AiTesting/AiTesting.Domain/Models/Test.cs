@@ -1,4 +1,5 @@
 ﻿using AiTesting.Domain.Common;
+using AiTesting.Domain.Enums;
 
 namespace AiTesting.Domain.Models;
 
@@ -83,6 +84,42 @@ public class Test
     {
         if (question == null) return Result.Failure("Question cannot be null");
         Questions.Add(question);
+        return Result.Success();
+    }
+
+    public Result RemoveQuestions(IEnumerable<Guid> questionIds)
+    {
+        if (questionIds == null)
+            return Result.Failure("No question ids provided");
+
+        Questions.RemoveAll(q => questionIds.Contains(q.Id));
+        return Result.Success();
+    }
+
+    public Result UpdateQuestion(Question updatedQuestion)
+    {
+        var question = Questions.FirstOrDefault(q => q.Id == updatedQuestion.Id);
+        if (question == null)
+            return Result.Failure("Question not found");
+
+        var updateMetadataResult = question.Update(
+            updatedQuestion.Text, 
+            updatedQuestion.Order, 
+            updatedQuestion.ImageUrl,
+            updatedQuestion.Type,
+            updatedQuestion.CorrectTextAnswer
+        );
+
+        if (updateMetadataResult.IsFailure) return updateMetadataResult;
+
+        question.Options.Clear();
+        
+        foreach(var option in updatedQuestion.Options)
+            question.Options.Add(option);
+
+        question.SetCorrectTextAnswer(updatedQuestion.CorrectTextAnswer);
+        question.SetCorrectAnswers(updatedQuestion.CorrectAnswers);
+
         return Result.Success();
     }
 }

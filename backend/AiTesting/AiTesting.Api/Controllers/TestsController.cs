@@ -37,8 +37,77 @@ public class TestsController : ControllerBase
     }
 
     [Authorize]
+    [HttpPut("metadata")]
+    public async Task<IActionResult> UpdateMetadata([FromForm] UpdateTestMetadataDto dto)
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _testManageService.UpdateMetadata(dto, ownerIdResult.Value, baseUrl);
+
+        return result.IsSuccess ?
+               NoContent() :
+               BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
+    [HttpPut("questions")]
+    public async Task<IActionResult> UpdateQuestions([FromBody] UpdateQuestionsDto dto)
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        var result = await _testManageService.UpdateQuestions(dto, ownerIdResult.Value);
+
+        return result.IsSuccess ?
+               NoContent() :
+               BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
+    [HttpPost("question/image")]
+    public async Task<IActionResult> UpdateQuestionImage([FromForm] UpdateQuestionImageDto dto)
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _testManageService.UpdateQuestionImage(dto, ownerIdResult.Value, baseUrl);
+
+        return result.IsSuccess ?
+               Ok() :
+               BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
+    [HttpPost("question/option/image")]
+    public async Task<IActionResult> UpdateOptionImage([FromForm] UpdateOptionImageDto dto)
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _testManageService.UpdateOptionImage(dto, ownerIdResult.Value, baseUrl);
+
+        return result.IsSuccess ?
+               Ok() :
+               BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id )
+    public async Task<IActionResult> Delete(Guid id)
     {
         var ownerIdResult = GetUserId();
         if (ownerIdResult.IsFailure)

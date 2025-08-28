@@ -19,7 +19,7 @@ public class AnswerOption
         }
     }
 
-    public string ImageUrl { get; private set; }
+    public string ImageUrl { get; set; }
 
     protected AnswerOption() { }
 
