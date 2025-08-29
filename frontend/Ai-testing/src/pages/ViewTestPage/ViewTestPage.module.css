@@ -158,3 +158,9 @@
   color: #64748b;
   font-weight: 500;
 }
+
+.questionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

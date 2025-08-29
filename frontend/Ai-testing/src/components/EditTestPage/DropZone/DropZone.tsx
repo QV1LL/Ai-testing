@@ -3,7 +3,7 @@ import styles from "./DropZone.module.css";
 
 interface DropZoneProps {
   onFileSelect: (file: File) => void;
-  preview?: File | null;
+  preview?: string | null;
 }
 
 const DropZone: React.FC<DropZoneProps> = ({ onFileSelect, preview }) => {
@@ -45,11 +45,7 @@ const DropZone: React.FC<DropZoneProps> = ({ onFileSelect, preview }) => {
       onDrop={handleDrop}
     >
       {preview ? (
-        <img
-          src={URL.createObjectURL(preview)}
-          alt="preview"
-          style={{ maxHeight: "100px" }}
-        />
+        <img src={preview} alt="preview" style={{ maxHeight: "100px" }} />
       ) : dragActive ? (
         <p>Drop image here...</p>
       ) : (

@@ -62,7 +62,10 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var result = await _testManageService.UpdateQuestions(dto, ownerIdResult.Value);
+        var request = HttpContext.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var result = await _testManageService.UpdateQuestions(dto, ownerIdResult.Value, baseUrl);
 
         return result.IsSuccess ?
                NoContent() :

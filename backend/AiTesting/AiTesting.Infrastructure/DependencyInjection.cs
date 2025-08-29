@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IGuestRepository, GuestRepository>();
         services.AddScoped<ITestAttemptRepository, TestAttemptRepository>();
         services.AddScoped<ITestRepository, TestRepository>();
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 

@@ -1,5 +1,7 @@
 ﻿using AiTesting.Domain.Common;
 using AiTesting.Domain.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AiTesting.Domain.Models;
 
@@ -103,22 +105,39 @@ public class Test
             return Result.Failure("Question not found");
 
         var updateMetadataResult = question.Update(
-            updatedQuestion.Text, 
-            updatedQuestion.Order, 
+            updatedQuestion.Text,
+            updatedQuestion.Order,
             updatedQuestion.ImageUrl,
             updatedQuestion.Type,
             updatedQuestion.CorrectTextAnswer
         );
-
         if (updateMetadataResult.IsFailure) return updateMetadataResult;
 
-        question.Options.Clear();
-        
-        foreach(var option in updatedQuestion.Options)
-            question.Options.Add(option);
+        var existingOptions = question.Options.ToDictionary(o => o.Id);
+        var updatedOptions = updatedQuestion.Options.ToDictionary(o => o.Id);
 
+        question.Options.RemoveAll(o => !updatedOptions.ContainsKey(o.Id));
+
+        foreach (var option in updatedOptions.Values)
+        {
+            if (!existingOptions.ContainsKey(option.Id))
+            {
+                question.Options.Add(option);
+            }
+            else
+            {
+                var existing = existingOptions[option.Id];
+                existing.Text = option.Text;
+                existing.ImageUrl = option.ImageUrl;
+            }
+        }
+
+        var existingCorrect = question.CorrectAnswers.ToDictionary(ca => ca.Id);
+        var updatedCorrect = updatedQuestion.CorrectAnswers.ToDictionary(ca => ca.Id);
+
+        question.CorrectAnswers.RemoveAll(ca => !updatedCorrect.ContainsKey(ca.Id));
+        question.CorrectAnswers.AddRange(updatedCorrect.Values.Where(ca => !existingCorrect.ContainsKey(ca.Id)));
         question.SetCorrectTextAnswer(updatedQuestion.CorrectTextAnswer);
-        question.SetCorrectAnswers(updatedQuestion.CorrectAnswers);
 
         return Result.Success();
     }

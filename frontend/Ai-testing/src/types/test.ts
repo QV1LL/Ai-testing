@@ -22,9 +22,28 @@ export interface UpdateTestMetadataDto {
 
 export interface UpdateQuestionsDto {
   testId: string;
-  questionsToAdd: QuestionDto[];
+  questionsToAdd: UpdateQuestionDto[];
+  questionsToUpdate: UpdateQuestionDto[];
   questionsToDeleteIds: string[];
-  questionsToUpdate: QuestionDto[];
+}
+
+export interface UpdateQuestionDto {
+  id: string;
+  text: string;
+  type: QuestionType;
+  order: number;
+  imageFile?: File | null;
+  imageUrl?: string | null;
+  options: UpdateOptionDto[];
+  correctAnswers: UpdateOptionDto[];
+  correctTextAnswer?: string | null;
+}
+
+export interface UpdateOptionDto {
+  id: string;
+  text: string;
+  imageFile?: File | null;
+  imageUrl?: string | null;
 }
 
 export interface UpdateQuestionImageDto {
@@ -53,7 +72,7 @@ export enum QuestionType {
 export interface AnswerOptionDto {
   id: string;
   text: string;
-  imageFile?: File | null;
+  imageUrl?: string | null;
   order: number;
 }
 
@@ -67,7 +86,7 @@ export enum QuestionState {
 export interface QuestionDto {
   id: string;
   text: string;
-  imageFile?: File | null;
+  imageUrl?: string | null;
   type: QuestionType;
   order: number;
   options: AnswerOptionDto[];
@@ -75,7 +94,7 @@ export interface QuestionDto {
   correctTextAnswer?: string | null;
 }
 
-export interface EditableQuestionDto extends QuestionDto {
+export interface EditableQuestionDto extends UpdateQuestionDto {
   state: QuestionState;
 }
 

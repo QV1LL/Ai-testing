@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   type EditableQuestionDto,
-  type AnswerOptionDto,
+  type UpdateOptionDto,
   QuestionType,
   QuestionState,
 } from "../../../types/test";
@@ -12,9 +12,9 @@ interface Props {
   questions: EditableQuestionDto[];
   setQuestions: (qs: EditableQuestionDto[]) => void;
   selectedQuestion: EditableQuestionDto | null;
-  selectedOption: AnswerOptionDto | null;
+  selectedOption: UpdateOptionDto | null;
   setSelectedQuestion: (q: EditableQuestionDto | null) => void;
-  setSelectedOption: (o: AnswerOptionDto | null) => void;
+  setSelectedOption: (o: UpdateOptionDto | null) => void;
 }
 
 const SidebarEditor: React.FC<Props> = ({
@@ -56,7 +56,7 @@ const SidebarEditor: React.FC<Props> = ({
 
   const updateOptionText = (text: string) => {
     if (!selectedQuestion || !selectedOption) return;
-    const updatedOption = { ...selectedOption, text };
+    const updatedOption: UpdateOptionDto = { ...selectedOption, text };
     const nextQ: EditableQuestionDto = {
       ...selectedQuestion,
       options: selectedQuestion.options.map((o) =>
@@ -98,7 +98,7 @@ const SidebarEditor: React.FC<Props> = ({
       options: selectedQuestion.options
         .filter((o) => o.id !== selectedOption.id)
         .map((o, i) => ({ ...o, order: i })),
-      correctAnswers: (selectedQuestion.correctAnswers || []).filter(
+      correctAnswers: selectedQuestion.correctAnswers.filter(
         (o) => o.id !== selectedOption.id
       ),
       state: markChanged(selectedQuestion),
@@ -107,6 +107,38 @@ const SidebarEditor: React.FC<Props> = ({
     setQuestions(next);
     setSelectedQuestion(nextQ);
     setSelectedOption(null);
+  };
+
+  const toggleCorrectAnswer = (option: UpdateOptionDto) => {
+    if (!selectedQuestion) return;
+
+    let updatedCorrect: UpdateOptionDto[] = [];
+
+    if (selectedQuestion.type === QuestionType.SingleChoice) {
+      updatedCorrect = [option];
+    } else if (selectedQuestion.type === QuestionType.MultipleChoice) {
+      const exists = selectedQuestion.correctAnswers?.some(
+        (ca) => ca.id === option.id
+      );
+      updatedCorrect = exists
+        ? selectedQuestion.correctAnswers.filter((ca) => ca.id !== option.id)
+        : [...(selectedQuestion.correctAnswers || []), option];
+    }
+
+    const nextQ: EditableQuestionDto = {
+      ...selectedQuestion,
+      correctAnswers: updatedCorrect,
+      state: markChanged(selectedQuestion),
+    };
+
+    const next = questions.map((q) => (q.id === nextQ.id ? nextQ : q));
+    setQuestions(next);
+    setSelectedQuestion(nextQ);
+
+    const stillExists = nextQ.options.find((o) => o.id === option.id);
+    if (stillExists) {
+      setSelectedOption(stillExists);
+    }
   };
 
   const editorContent = (
@@ -139,19 +171,22 @@ const SidebarEditor: React.FC<Props> = ({
                 value={selectedQuestion.type}
                 onChange={(e) => {
                   const nextType = Number(e.target.value) as QuestionType;
-                  const normalized =
+                  const normalized: EditableQuestionDto =
                     nextType === QuestionType.OpenEnded
                       ? {
                           ...selectedQuestion,
                           type: nextType,
                           options: [],
-                          correctOptions: [],
+                          correctAnswers: [],
+                          correctTextAnswer: null,
                           state: markChanged(selectedQuestion),
                         }
                       : {
                           ...selectedQuestion,
                           type: nextType,
                           correctTextAnswer: null,
+                          options: selectedQuestion.options || [],
+                          correctAnswers: [],
                           state: markChanged(selectedQuestion),
                         };
                   const next = questions.map((q) =>
@@ -181,11 +216,12 @@ const SidebarEditor: React.FC<Props> = ({
             </label>
 
             <DropZone
-              preview={selectedQuestion.imageFile ?? null}
+              preview={selectedQuestion.imageUrl ?? null}
               onFileSelect={(file) => {
                 updateQuestion((q) => ({
                   ...q,
                   imageFile: file,
+                  imageUrl: URL.createObjectURL(file),
                   state: markChanged(q),
                 }));
               }}
@@ -202,7 +238,7 @@ const SidebarEditor: React.FC<Props> = ({
                   onChange={(e) =>
                     updateQuestion((q) => ({
                       ...q,
-                      correctTextAnswer: e.target.value,
+                      correctTextAnswer: e.target.value || null,
                       state: markChanged(q),
                     }))
                   }
@@ -219,11 +255,30 @@ const SidebarEditor: React.FC<Props> = ({
                   onChange={(e) => updateOptionText(e.target.value)}
                 />
               </label>
+
+              {(selectedQuestion.type === QuestionType.SingleChoice ||
+                selectedQuestion.type === QuestionType.MultipleChoice) && (
+                <label className={styles.checkbox}>
+                  Mark as correct:
+                  <input
+                    type="checkbox"
+                    checked={selectedQuestion.correctAnswers?.some(
+                      (ca) => ca.id === selectedOption.id
+                    )}
+                    onChange={() => toggleCorrectAnswer(selectedOption)}
+                  />
+                </label>
+              )}
+
               <DropZone
-                preview={selectedOption?.imageFile ?? null}
+                preview={selectedOption?.imageUrl ?? null}
                 onFileSelect={(file) => {
                   if (!selectedQuestion || !selectedOption) return;
-                  const updatedOption = { ...selectedOption, imageFile: file };
+                  const updatedOption: UpdateOptionDto = {
+                    ...selectedOption,
+                    imageFile: file,
+                    imageUrl: URL.createObjectURL(file),
+                  };
                   const nextQ: EditableQuestionDto = {
                     ...selectedQuestion,
                     options: selectedQuestion.options.map((o) =>

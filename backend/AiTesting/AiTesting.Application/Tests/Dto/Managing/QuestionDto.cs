@@ -9,5 +9,5 @@ public record QuestionDto(
     int Order,
     QuestionType Type,
     List<AnswerOptionDto> Options,
-    List<AnswerOptionDto> CorrectOptions
+    List<AnswerOptionDto> CorrectAnswers
 );

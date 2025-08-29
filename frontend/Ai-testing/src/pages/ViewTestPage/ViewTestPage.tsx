@@ -5,10 +5,7 @@ import styles from "./ViewTestPage.module.css";
 import type { FullTestDto } from "../../types/test";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import {
-  FixedSizeList as List,
-  type ListChildComponentProps,
-} from "react-window";
+import QuestionCard from "../../components/ViewTestPage/QuestionCard/QuestionCard";
 
 const ViewTestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +20,7 @@ const ViewTestPage: React.FC = () => {
         const data = await getById(id);
         setTest(data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     fetchTest();
@@ -31,36 +28,17 @@ const ViewTestPage: React.FC = () => {
 
   if (!test) return <div className={styles.loader}>Loading...</div>;
 
-  const QuestionRow = ({ index, style }: ListChildComponentProps) => {
-    const q = test.questions[index];
-    return (
-      <div style={style} className={styles.question}>
-        <h3>
-          {index + 1}. {q.text}
-        </h3>
-        <ul>
-          {q.options.map((o) => (
-            <li
-              key={o.id}
-              className={
-                q.correctAnswers.some((ca) => ca.id === o.id)
-                  ? styles.correct
-                  : ""
-              }
-            >
-              {o.text}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
+  const sortedQuestions = [...test.questions].sort(
+    (a, b) => (a.order ?? 0) - (b.order ?? 0)
+  );
 
   return (
     <div className={styles.viewTestPage}>
       <Header />
+
       <div className={styles.wrapper}>
         <div className={styles.container}>
+          {/* Test Header */}
           <div
             className={styles.header}
             style={{
@@ -72,7 +50,6 @@ const ViewTestPage: React.FC = () => {
             <div className={styles.overlay}>
               <h1>{test.title}</h1>
               {test.description && <p>{test.description}</p>}
-
               <div className={styles.overlayFooter}>
                 <button
                   className={styles.editButton}
@@ -93,6 +70,7 @@ const ViewTestPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Tabs */}
           <div className={styles.tabs}>
             <button
               onClick={() => setTab("questions")}
@@ -108,17 +86,19 @@ const ViewTestPage: React.FC = () => {
             </button>
           </div>
 
+          {/* Content */}
           <div className={styles.content}>
             {tab === "questions" ? (
-              test.questions.length > 0 ? (
-                <List
-                  height={500}
-                  itemCount={test.questions.length}
-                  itemSize={120}
-                  width="100%"
-                >
-                  {QuestionRow}
-                </List>
+              sortedQuestions.length > 0 ? (
+                <div className={styles.questionsList}>
+                  {sortedQuestions.map((question, index) => (
+                    <QuestionCard
+                      key={question.id}
+                      question={question}
+                      index={index}
+                    />
+                  ))}
+                </div>
               ) : (
                 <div className={styles.noQuestions}>
                   <p>No questions in this test yet.</p>
@@ -133,6 +113,7 @@ const ViewTestPage: React.FC = () => {
           </div>
         </div>
       </div>
+
       <Footer />
     </div>
   );

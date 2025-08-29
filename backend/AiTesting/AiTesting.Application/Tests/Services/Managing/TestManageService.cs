@@ -70,7 +70,7 @@ internal class TestManageService : ITestManageService
                         Text: o.Text,
                         ImageUrl: o.ImageUrl
                     )).ToList(),
-                    CorrectOptions: q.CorrectAnswers.Select(o => new AnswerOptionDto(
+                    CorrectAnswers: q.CorrectAnswers.Select(o => new AnswerOptionDto(
                         Id: o.Id,
                         Text: o.Text,
                         ImageUrl: o.ImageUrl
@@ -170,7 +170,7 @@ internal class TestManageService : ITestManageService
         }
     }
 
-    public async Task<Result> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId)
+    public async Task<Result> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId, string apiUrl)
     {
         var testResult = await _testService.GetByIdAsync(dto.TestId);
 
@@ -181,11 +181,11 @@ internal class TestManageService : ITestManageService
         if (test.CreatedById != ownerId) return Result.Failure("Cannot update test that doesn`t belong to this user");
 
         var questionsToAdd = dto.QuestionsToAdd.Select(
-            qdto => UpdateQuestionDtoToQuestion(qdto, test)
+            (qdto) => UpdateQuestionDtoToQuestionAsync(qdto, test, apiUrl)
         );
 
         var questionsToUpdate = dto.QuestionsToUpdate.Select(
-            qdto => UpdateQuestionDtoToQuestion(qdto, test)
+            (qdto) => UpdateQuestionDtoToQuestionAsync(qdto, test, apiUrl, false)
         );
 
         return await _testService.UpdateTestQuestionsAsync(
@@ -217,9 +217,10 @@ internal class TestManageService : ITestManageService
 
         if (questionImageUrlResult.IsSuccess)
         {
-            var oldImageRelativeUrl = test.CoverImageUrl.Replace(apiUrl, string.Empty);
+            var oldImageRelativeUrl = question.ImageUrl.Replace(apiUrl, string.Empty);
             question.ImageUrl = $"{apiUrl}{questionImageUrl}";
             await _fileStorageService.DeleteFileAsync(oldImageRelativeUrl);
+            await _testService.UpdateTestQuestionsAsync(test, [], [question], []);
         }
 
         return Result.Success();
@@ -253,6 +254,7 @@ internal class TestManageService : ITestManageService
             var oldImageRelativeUrl = option.ImageUrl.Replace(apiUrl, string.Empty);
             option.ImageUrl = $"{apiUrl}{optionImageUrl}";
             await _fileStorageService.DeleteFileAsync(oldImageRelativeUrl);
+            await _testService.UpdateTestQuestionsAsync(test, [], [question], []);
         }
 
         return Result.Success();
@@ -286,57 +288,70 @@ internal class TestManageService : ITestManageService
         return result;
     }
 
-    private static Question UpdateQuestionDtoToQuestion(UpdateQuestionDto dto, Test test)
+    private Question UpdateQuestionDtoToQuestionAsync(UpdateQuestionDto dto, Test test, string apiUrl, bool newQuestion = true)
     {
-        var questionResult = Question.Create(
-            test,
-            dto.Type,
-            dto.Text,
-            dto.Order,
-            dto.CorrectTextAnswer ?? "",
-            "" 
-        );
+        Question question = null!;
 
-        if (questionResult.IsFailure)
-            throw new InvalidOperationException($"Cannot create question: {questionResult.Error}");
-
-        var question = questionResult.Value;
-
-        if (dto.Options != null && dto.Options.Any())
+        if (newQuestion)
         {
-            foreach (var optionDto in dto.Options)
+            var questionResult = Question.Create(
+                test,
+                dto.Type,
+                dto.Text,
+                dto.Order,
+                dto.CorrectTextAnswer ?? "",
+                ""
+            );
+
+            if (questionResult.IsFailure)
+                throw new InvalidOperationException($"Cannot create question: {questionResult.Error}");
+
+            question = questionResult.Value;
+        }
+        else
+        {
+            question = test.Questions.FirstOrDefault(q => q.Id == dto.Id)!;
+
+            if (question == null)
+                throw new InvalidOperationException($"Question not found");
+
+            question.Update(
+                dto.Text, 
+                dto.Order, 
+                question.ImageUrl, 
+                dto.Type, 
+                dto.CorrectTextAnswer
+            );
+        }
+
+        var optionsToRemove = question.Options.Where(o => !dto.Options.Select(odto => odto.Id).Contains(o.Id));
+
+        foreach(var optionToRemove in optionsToRemove)
+            _fileStorageService.DeleteFileAsync(optionToRemove.ImageUrl.Replace(apiUrl, string.Empty)).Wait();
+
+        question.Options.RemoveAll(o => optionsToRemove.Contains(o));
+        question.CorrectAnswers.RemoveAll(ca => !dto.CorrectAnswers.Select(cadto => cadto.Id).Contains(ca.Id));
+
+        foreach (var optionDto in dto.Options)
+        {
+            var existingOption = question.Options.FirstOrDefault(o => o.Id == optionDto.Id);
+            if (existingOption != null)
+                existingOption.Text = optionDto.Text;
+            else
             {
-                var existingOption = question.Options.FirstOrDefault(o => o.Id == optionDto.Id);
-
-                if (existingOption != null)
-                {
-                    existingOption.Text = optionDto.Text;
-                }
-                else
-                {
-                    var newOptionResult = AnswerOption.Create(
-                        question,
-                        optionDto.Text,
-                        "" 
-                    );
-
-                    if (newOptionResult.IsSuccess)
-                        question.AddOption(newOptionResult.Value);
-                }
+                var newOption = AnswerOption.Create(question, optionDto.Text, "");
+                if (newOption.IsSuccess)
+                    question.AddOption(newOption.Value);
             }
         }
 
-        if (dto.CorrectAnswers != null && dto.CorrectAnswers.Any() && question.Type != QuestionType.OpenEnded)
+        if (question.Type != QuestionType.OpenEnded)
         {
             var correctOptions = question.Options
-                .Where(o => dto.CorrectAnswers.Any(co => co.Id == o.Id))
+                .Where(o => dto.CorrectAnswers.Any(ca => ca.Id == o.Id))
                 .ToList();
-
             question.SetCorrectAnswers(correctOptions);
         }
-
-        if (question.Type == QuestionType.OpenEnded)
-            question.SetCorrectTextAnswer(dto.CorrectTextAnswer);
 
         return question;
     }

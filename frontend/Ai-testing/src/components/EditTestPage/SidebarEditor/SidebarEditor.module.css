@@ -93,3 +93,82 @@
   border: 1px solid #d1d5db;
   font-size: 1rem;
 }
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4a6fa1;
+  border-radius: 4px;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+input[type="checkbox"]::before {
+  content: "✓";
+  font-size: 16px;
+  color: white;
+  transform: scale(0);
+  transition: 0.2s;
+}
+input[type="checkbox"]:checked {
+  background: #4a6fa1;
+  border-color: #4a6fa1;
+}
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+/* Rounded style with cross */
+input[type="checkbox"].cross {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #888;
+  border-radius: 6px;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+input[type="checkbox"].cross::before {
+  content: "✕";
+  font-size: 14px;
+  color: white;
+  transform: scale(0);
+  transition: 0.2s;
+}
+input[type="checkbox"].cross:checked {
+  background: #e63946;
+  border-color: #e63946;
+}
+input[type="checkbox"].cross:checked::before {
+  transform: scale(1);
+}
+
+/* Circle with dot */
+input[type="checkbox"].dot {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #2a5298;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+input[type="checkbox"].dot::before {
+  content: "•";
+  font-size: 24px;
+  color: #2a5298;
+  transform: scale(0);
+  transition: 0.2s;
+}
+input[type="checkbox"].dot:checked::before {
+  transform: scale(1);
+}

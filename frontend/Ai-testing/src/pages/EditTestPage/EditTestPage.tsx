@@ -10,7 +10,7 @@ import {
   type FullTestDto,
   type UpdateTestMetadataDto,
   type UpdateQuestionsDto,
-  type AnswerOptionDto,
+  type UpdateOptionDto,
 } from "../../types/test";
 import { type EditableQuestionDto, QuestionState } from "../../types/test";
 
@@ -26,32 +26,39 @@ const EditTestPage: React.FC = () => {
 
   const [test, setTest] = useState<FullTestDto | null>(null);
   const [questions, setQuestions] = useState<EditableQuestionDto[]>([]);
-
   const [selectedQuestion, setSelectedQuestion] =
     useState<EditableQuestionDto | null>(null);
-  const [selectedOption, setSelectedOption] = useState<AnswerOptionDto | null>(
+  const [selectedOption, setSelectedOption] = useState<UpdateOptionDto | null>(
     null
   );
-
   const [preview, setPreview] = useState<string>("");
 
+  const fetchTest = async () => {
+    if (!id) return;
+    try {
+      const data = await getById(id);
+
+      setQuestions(
+        data.questions.map((q) => ({
+          ...q,
+          state: QuestionState.Unchanged,
+          options: q.options.map((o) => ({
+            id: o.id,
+            text: o.text,
+            imageFile: null,
+            imageUrl: o.imageUrl ?? null,
+          })),
+        }))
+      );
+
+      setTest(data);
+      setPreview(data.coverImageUrl ?? "");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchTest = async () => {
-      if (!id) return;
-      try {
-        const data = await getById(id);
-        setTest(data);
-        setQuestions(
-          data.questions.map((q) => ({
-            ...q,
-            state: QuestionState.Unchanged,
-          }))
-        );
-        setPreview(data.coverImageUrl ?? "");
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchTest();
   }, [id]);
 
@@ -73,9 +80,11 @@ const EditTestPage: React.FC = () => {
     const questionsToAdd = questions.filter(
       (q) => q.state === QuestionState.Added
     );
+
     const questionsToUpdate = questions.filter(
       (q) => q.state === QuestionState.Changed
     );
+
     const questionsToDeleteIds = questions
       .filter((q) => q.state === QuestionState.Deleted)
       .map((q) => q.id);
@@ -95,7 +104,7 @@ const EditTestPage: React.FC = () => {
       questionsToDeleteIds,
     };
 
-    await updateTestQuestionsWithImages(dto);
+    await updateTestQuestionsWithImages(dto, fetchTest);
 
     setQuestions((prev) =>
       prev

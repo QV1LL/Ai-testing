@@ -1,8 +1,7 @@
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
 import {
   type EditableQuestionDto,
-  type AnswerOptionDto,
+  type UpdateOptionDto,
   QuestionType,
   QuestionState,
 } from "../../../types/test";
@@ -18,7 +17,7 @@ interface Props {
   questions: EditableQuestionDto[];
   setQuestions: (qs: EditableQuestionDto[]) => void;
   setSelectedQuestion: (q: EditableQuestionDto | null) => void;
-  setSelectedOption: (o: AnswerOptionDto | null) => void;
+  setSelectedOption: (o: UpdateOptionDto | null) => void;
 }
 
 const QuestionsList: React.FC<Props> = ({
@@ -33,7 +32,7 @@ const QuestionsList: React.FC<Props> = ({
 
   const addQuestion = () => {
     const newQuestion: EditableQuestionDto = {
-      id: uuidv4(),
+      id: generateTempGuid(),
       text: "",
       imageFile: null,
       type: QuestionType.SingleChoice,
@@ -48,13 +47,22 @@ const QuestionsList: React.FC<Props> = ({
     setSelectedOption(null);
   };
 
+  const generateTempGuid = (): string => {
+    const randomBlock = () =>
+      Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+
+    return `00000000-${randomBlock()}-${randomBlock()}-${randomBlock()}-${randomBlock()}${randomBlock()}${randomBlock()}`;
+  };
+
   const addOption = (q: EditableQuestionDto) => {
     if (q.type === QuestionType.OpenEnded) return;
-    const newOption: AnswerOptionDto = {
-      id: uuidv4(),
+    const newOption: UpdateOptionDto = {
+      id: generateTempGuid(),
       text: "",
       imageFile: null,
-      order: q.options.length,
+      imageUrl: null,
     };
     const updatedQuestion: EditableQuestionDto = {
       ...q,
@@ -72,8 +80,10 @@ const QuestionsList: React.FC<Props> = ({
     const reordered = Array.from(visibleQuestions);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
+
     const updatedOrders = new Map<string, number>();
     reordered.forEach((q, i) => updatedOrders.set(q.id, i));
+
     const next = questions.map((q) => {
       if (!updatedOrders.has(q.id)) return q;
       const newOrder = updatedOrders.get(q.id)!;
@@ -100,6 +110,7 @@ const QuestionsList: React.FC<Props> = ({
           + Add question
         </button>
       </div>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="questions">
           {(provided) => (
@@ -126,6 +137,7 @@ const QuestionsList: React.FC<Props> = ({
                           <span className={styles.badge}>edited</span>
                         )}
                       </div>
+
                       {q.type !== QuestionType.OpenEnded && (
                         <div className={styles.options}>
                           {q.options.map((o, i) => (

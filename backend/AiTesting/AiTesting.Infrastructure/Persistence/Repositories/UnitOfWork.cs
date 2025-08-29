@@ -9,6 +9,7 @@ public class UnitOfWork : IUnitOfWork
     public IGuestRepository Guests { get; }
     public IUserRepository Users { get; }
     public ITestRepository Tests { get; }
+    public IQuestionRepository Questions { get; }
     public ITestAttemptRepository TestAttempts { get; }
 
     private readonly DbContext _dbContext;
@@ -17,13 +18,15 @@ public class UnitOfWork : IUnitOfWork
                       IGuestRepository guestRepository,
                       IUserRepository userRepository,
                       ITestRepository testRepository,
-                      ITestAttemptRepository testAttemptRepository)
+                      ITestAttemptRepository testAttemptRepository,
+                      IQuestionRepository questions)
     {
         _dbContext = dbContext;
         Guests = guestRepository;
         Users = userRepository;
         Tests = testRepository;
         TestAttempts = testAttemptRepository;
+        Questions = questions;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

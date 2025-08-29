@@ -65,6 +65,27 @@ public class Question
         }
     }
 
+    public static Result<Question> CreateExisting(
+                                          Guid id,
+                                          Test test,
+                                          QuestionType type,
+                                          string text,
+                                          int order,
+                                          string? correctTextAnswer = null,
+                                          string imageUrl = "")
+    {
+        try
+        {
+            return Result<Question>.Success(
+                new Question(id, test, type, text, imageUrl, correctTextAnswer, order)
+                );
+        }
+        catch (ArgumentException ex)
+        {
+            return Result<Question>.Failure(ex.Message);
+        }
+    }
+
     public Result AddOption(AnswerOption option)
     {
         if (option == null) return Result.Failure("Option cannot be null");

@@ -1,10 +1,10 @@
 import type {
-  AnswerOptionDto,
   CreateTestDto,
   FullTestDto,
-  QuestionDto,
   TestDto,
+  UpdateOptionDto,
   UpdateOptionImageDto,
+  UpdateQuestionDto,
   UpdateQuestionImageDto,
   UpdateQuestionsDto,
   UpdateTestMetadataDto,
@@ -70,8 +70,11 @@ export const updateTestData = async (
 };
 
 export const updateTestQuestionsWithImages = async (
-  dto: UpdateQuestionsDto
+  dto: UpdateQuestionsDto,
+  questionsInfoLoaded: () => Promise<void>
 ): Promise<void> => {
+  console.log(dto);
+
   const dtoWithoutFiles = {
     ...dto,
     questionsToAdd: dto.questionsToAdd.map((q) => ({
@@ -87,10 +90,11 @@ export const updateTestQuestionsWithImages = async (
   };
 
   await api.put("/tests/questions", dtoWithoutFiles);
+  await questionsInfoLoaded();
 
   const uploadPromises: Promise<void>[] = [];
 
-  const handleQuestionImages = (question: QuestionDto) => {
+  const handleQuestionImages = (question: UpdateQuestionDto) => {
     if (question.imageFile) {
       const qDto: UpdateQuestionImageDto = {
         testId: dto.testId,
@@ -100,7 +104,7 @@ export const updateTestQuestionsWithImages = async (
       uploadPromises.push(updateQuestionImage(qDto));
     }
 
-    question.options.forEach((option: AnswerOptionDto) => {
+    question.options.forEach((option: UpdateOptionDto) => {
       if (option.imageFile) {
         const oDto: UpdateOptionImageDto = {
           testId: dto.testId,

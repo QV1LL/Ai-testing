@@ -1,0 +1,50 @@
+.questionCard {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.questionImage {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  margin: 0 0 8px 0;
+}
+
+.optionsList {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.optionsList li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.optionImage {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+.correct {
+  font-weight: bold;
+  color: green;
+}
+
+.correctTextAnswer {
+  margin-top: 8px;
+  font-weight: bold;
+}
