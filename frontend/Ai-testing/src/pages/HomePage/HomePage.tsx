@@ -12,7 +12,7 @@ const HomePage: React.FC = () => {
 
   const handleJoinTest = () => {
     if (testId.trim()) {
-      window.location.href = `/test/${testId}`;
+      window.location.href = `/pass-test/${testId}`;
     }
   };
 

@@ -1,0 +1,106 @@
+.passTestPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(#ddd 20%, #92b1da);
+}
+
+.wrapper {
+  display: flex;
+  padding: 2rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.container {
+  max-width: var(--content-max-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--items-gap);
+  margin: 2rem auto;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-family: sans-serif;
+}
+
+.header {
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 2rem;
+}
+
+.overlay h1 {
+  text-align: center;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.overlay p {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.active {
+  background: white !important;
+  border-bottom: 2px solid #1e3c72;
+  font-weight: bold;
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.question {
+  margin-bottom: 1rem;
+}
+
+.question h3 {
+  margin: 0 0 0.5rem;
+}
+
+.question ul {
+  list-style: disc inside;
+  margin: 0;
+  padding: 0;
+}
+
+.stats {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.loader {
+  text-align: center;
+  padding: 2rem;
+}
+
+.noQuestions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.questionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
