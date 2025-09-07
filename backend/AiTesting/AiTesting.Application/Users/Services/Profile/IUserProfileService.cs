@@ -7,6 +7,6 @@ namespace AiTesting.Application.Users.Services.Profile;
 public interface IUserProfileService
 {
     Task<Result<UserDto>> GetProfile(Guid id);
-    Task<Result> UpdateProfile(Guid id, UpdateProfileDto dto, IFormFile? avatarImage, string apiUrl);
-    Task<Result> DeleteProfile(Guid id, string apiUrl);
+    Task<Result> UpdateProfile(Guid id, UpdateProfileDto dto, IFormFile? avatarImage);
+    Task<Result> DeleteProfile(Guid id);
 }

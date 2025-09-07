@@ -7,6 +7,7 @@ import type {
   UpdateQuestionDto,
   UpdateQuestionImageDto,
   UpdateQuestionsDto,
+  UpdateQuestionsResultDto,
   UpdateTestMetadataDto,
   UserTestsResultDto,
 } from "../types/test";
@@ -69,12 +70,9 @@ export const updateTestData = async (
   });
 };
 
-export const updateTestQuestionsWithImages = async (
-  dto: UpdateQuestionsDto,
-  questionsInfoLoaded: () => Promise<void>
-): Promise<void> => {
-  console.log(dto);
-
+export const updateTestQuestions = async (
+  dto: UpdateQuestionsDto
+): Promise<UpdateQuestionsResultDto> => {
   const dtoWithoutFiles = {
     ...dto,
     questionsToAdd: dto.questionsToAdd.map((q) => ({
@@ -89,9 +87,17 @@ export const updateTestQuestionsWithImages = async (
     })),
   };
 
-  await api.put("/tests/questions", dtoWithoutFiles);
-  await questionsInfoLoaded();
+  const res = await api.put<UpdateQuestionsResultDto>(
+    "/tests/questions",
+    dtoWithoutFiles
+  );
 
+  return res.data;
+};
+
+export const updateQuestionsAndOptionsImages = async (
+  dto: UpdateQuestionsDto
+): Promise<void> => {
   const uploadPromises: Promise<void>[] = [];
 
   const handleQuestionImages = (question: UpdateQuestionDto) => {

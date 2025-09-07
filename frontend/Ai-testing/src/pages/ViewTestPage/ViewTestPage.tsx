@@ -19,6 +19,7 @@ const ViewTestPage: React.FC = () => {
       try {
         const data = await getById(id);
         setTest(data);
+        console.log(data);
       } catch (error) {
         console.error(error);
       }

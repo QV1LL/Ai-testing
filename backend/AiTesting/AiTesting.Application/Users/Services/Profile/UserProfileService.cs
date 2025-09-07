@@ -9,24 +9,28 @@ namespace AiTesting.Application.Users.Services.Profile;
 public class UserProfileService : IUserProfileService
 {
     private readonly IUserService _userService;
+
     private readonly IFileStorageService _fileStorageService;
+    private readonly Infrastructure.Services.Http.IHttpContextAccessor _httpContextAccessor;
 
     private const string AVATAR_IMAGES_SUBFOLDER = "users/avatars";
 
     public UserProfileService(IUserService userService, 
-                              IFileStorageService fileStorageService)
+                              IFileStorageService fileStorageService,
+                              Infrastructure.Services.Http.IHttpContextAccessor httpContextAccessor)
     {
         _userService = userService;
         _fileStorageService = fileStorageService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<Result> DeleteProfile(Guid id, string apiUrl)
+    public async Task<Result> DeleteProfile(Guid id)
     {
         var userResult = await _userService.GetByIdAsync(id);
 
         if (userResult.IsFailure) return userResult;
 
-        await _fileStorageService.DeleteFileAsync(userResult.Value.AvatarUrl.Replace(apiUrl, string.Empty));
+        await _fileStorageService.DeleteFileAsync(userResult.Value.AvatarUrl);
         return await _userService.DeleteAsync(id);
     }
 
@@ -40,7 +44,7 @@ public class UserProfileService : IUserProfileService
         var dto = new UserDto(
             user.DisplayName,
             user.Email,
-            user.AvatarUrl,
+            string.IsNullOrEmpty(user.AvatarUrl) ? user.AvatarUrl : $"{_httpContextAccessor.GetApiUrl()}{user.AvatarUrl}",
             user.Tests.Select(
                 t => new TestProfileDto(t.Id, t.Title, t.CreatedAt)).ToList(),
             user.TestAttempts.Select(
@@ -50,7 +54,7 @@ public class UserProfileService : IUserProfileService
         return Result<UserDto>.Success(dto);
     }
 
-    public async Task<Result> UpdateProfile(Guid id, UpdateProfileDto dto, IFormFile? avatarImage, string apiUrl)
+    public async Task<Result> UpdateProfile(Guid id, UpdateProfileDto dto, IFormFile? avatarImage)
     {
         var userResult = await _userService.GetByIdAsync(id);
 
@@ -69,8 +73,8 @@ public class UserProfileService : IUserProfileService
 
             if (avatarImageUrlResult.IsSuccess)
             {
-                var oldAvatarRelativeUrl = user.AvatarUrl.Replace(apiUrl, string.Empty);
-                user.AvatarUrl = $"{apiUrl}{avatarImageUrl}";
+                var oldAvatarRelativeUrl = user.AvatarUrl;
+                user.AvatarUrl = avatarImageUrl;
                 await _fileStorageService.DeleteFileAsync(oldAvatarRelativeUrl);
             }
 

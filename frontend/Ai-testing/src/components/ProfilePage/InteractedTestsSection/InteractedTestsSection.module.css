@@ -35,6 +35,7 @@
   padding: 0.75rem 1rem;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
+  text-wrap: nowrap;
 }
 
 .testTable th {
@@ -72,5 +73,9 @@
   .testsSection {
     flex-direction: row;
     gap: 1.5rem;
+  }
+
+  .testTable {
+    font-size: 0.9rem;
   }
 }

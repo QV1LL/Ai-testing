@@ -25,10 +25,7 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.Create(dto, coverImage, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.Create(dto, coverImage, ownerIdResult.Value);
 
         if (!result.IsSuccess)
             return BadRequest(new { error = result.Error });
@@ -44,10 +41,7 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.UpdateMetadata(dto, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.UpdateMetadata(dto, ownerIdResult.Value);
 
         return result.IsSuccess ?
                NoContent() :
@@ -62,13 +56,10 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.UpdateQuestions(dto, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.UpdateQuestions(dto, ownerIdResult.Value);
 
         return result.IsSuccess ?
-               NoContent() :
+               Ok(result.Value) :
                BadRequest(new { message = result.Error });
     }
 
@@ -80,10 +71,7 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.UpdateQuestionImage(dto, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.UpdateQuestionImage(dto, ownerIdResult.Value);
 
         return result.IsSuccess ?
                Ok() :
@@ -98,10 +86,7 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.UpdateOptionImage(dto, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.UpdateOptionImage(dto, ownerIdResult.Value);
 
         return result.IsSuccess ?
                Ok() :
@@ -116,10 +101,7 @@ public class TestsController : ControllerBase
         if (ownerIdResult.IsFailure)
             return Unauthorized(new { message = ownerIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _testManageService.Delete(id, ownerIdResult.Value, baseUrl);
+        var result = await _testManageService.Delete(id, ownerIdResult.Value);
 
         return result.IsSuccess ?
                 NoContent() :

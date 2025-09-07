@@ -6,6 +6,9 @@
   background: #fdfdfd;
   transition: all 0.3s ease;
   max-width: 400px;
+  position: sticky;
+  top: 15px;
+  align-self: flex-start;
 }
 
 .toggleButton {
@@ -151,6 +154,10 @@ input[type="checkbox"].cross:checked::before {
   transform: scale(1);
 }
 
+.questionTextInput {
+  text-wrap: wrap;
+}
+
 /* Circle with dot */
 input[type="checkbox"].dot {
   appearance: none;
@@ -171,4 +178,27 @@ input[type="checkbox"].dot::before {
 }
 input[type="checkbox"].dot:checked::before {
   transform: scale(1);
+}
+
+.editorForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.4;
+  background-color: #fff;
+  resize: none;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editorForm textarea:focus {
+  border-color: #4a6fa1;
+  box-shadow: 0 0 0 2px rgba(74, 111, 161, 0.2);
+  outline: none;
 }

@@ -27,6 +27,11 @@ export interface UpdateQuestionsDto {
   questionsToDeleteIds: string[];
 }
 
+export interface UpdateQuestionsResultDto {
+  questionTempToRegularIds: Record<string, string>;
+  optionTempToRegularIds: Record<string, string>;
+}
+
 export interface UpdateQuestionDto {
   id: string;
   text: string;

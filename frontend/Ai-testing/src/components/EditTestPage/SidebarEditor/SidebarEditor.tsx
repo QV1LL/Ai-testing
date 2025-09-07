@@ -72,21 +72,28 @@ const SidebarEditor: React.FC<Props> = ({
 
   const deleteSelectedQuestion = () => {
     if (!selectedQuestion) return;
+
     if (selectedQuestion.state === QuestionState.Added) {
       const left = questions.filter((q) => q.id !== selectedQuestion.id);
-      setQuestions(left.map((q, i) => ({ ...q, order: i })));
-    } else {
-      const next = questions
-        .map((q) =>
-          q.id === selectedQuestion.id
-            ? { ...q, state: QuestionState.Deleted }
-            : q
+
+      const deletedOrder = selectedQuestion.order;
+      setQuestions(
+        left.map((q) =>
+          q.order > deletedOrder ? { ...q, order: q.order - 1 } : q
         )
-        .map((q, i) =>
-          q.state === QuestionState.Deleted ? q : { ...q, order: i }
-        );
+      );
+    } else {
+      const deletedOrder = selectedQuestion.order;
+      const next = questions.map((q) =>
+        q.id === selectedQuestion.id
+          ? { ...q, state: QuestionState.Deleted }
+          : q.order > deletedOrder
+          ? { ...q, order: q.order - 1 }
+          : q
+      );
       setQuestions(next);
     }
+
     setSelectedQuestion(null);
     setSelectedOption(null);
   };
@@ -208,10 +215,10 @@ const SidebarEditor: React.FC<Props> = ({
 
             <label>
               Question text:
-              <input
-                type="text"
+              <textarea
                 value={selectedQuestion.text}
                 onChange={(e) => updateQuestionText(e.target.value)}
+                className={styles.questionTextInput}
               />
             </label>
 

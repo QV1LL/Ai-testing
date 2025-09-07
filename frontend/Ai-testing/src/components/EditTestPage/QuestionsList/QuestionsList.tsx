@@ -111,74 +111,76 @@ const QuestionsList: React.FC<Props> = ({
         </button>
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="questions">
-          {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {visibleQuestions.map((q, index) => (
-                <Draggable key={q.id} draggableId={q.id} index={index}>
-                  {(providedDraggable) => (
-                    <div
-                      ref={providedDraggable.innerRef}
-                      {...providedDraggable.draggableProps}
-                      {...providedDraggable.dragHandleProps}
-                      className={styles.item}
-                      onClick={() => {
-                        setSelectedQuestion(q);
-                        setSelectedOption(null);
-                      }}
-                    >
-                      <div className={styles.title}>
-                        {q.text?.trim() ? q.text : "Untitled Question"}
-                        {q.state === QuestionState.Added && (
-                          <span className={styles.badge}>new</span>
-                        )}
-                        {q.state === QuestionState.Changed && (
-                          <span className={styles.badge}>edited</span>
-                        )}
-                      </div>
+      <div className={styles.questions}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="questions">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {visibleQuestions.map((q, index) => (
+                  <Draggable key={q.id} draggableId={q.id} index={index}>
+                    {(providedDraggable) => (
+                      <div
+                        ref={providedDraggable.innerRef}
+                        {...providedDraggable.draggableProps}
+                        {...providedDraggable.dragHandleProps}
+                        className={styles.item}
+                        onClick={() => {
+                          setSelectedQuestion(q);
+                          setSelectedOption(null);
+                        }}
+                      >
+                        <div className={styles.title}>
+                          {q.text?.trim() ? q.text : "Untitled Question"}
+                          {q.state === QuestionState.Added && (
+                            <span className={styles.badge}>new</span>
+                          )}
+                          {q.state === QuestionState.Changed && (
+                            <span className={styles.badge}>edited</span>
+                          )}
+                        </div>
 
-                      {q.type !== QuestionType.OpenEnded && (
-                        <div className={styles.options}>
-                          {q.options.map((o, i) => (
-                            <div
-                              key={o.id}
-                              className={styles.optionRow}
+                        {q.type !== QuestionType.OpenEnded && (
+                          <div className={styles.options}>
+                            {q.options.map((o, i) => (
+                              <div
+                                key={o.id}
+                                className={styles.optionRow}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedQuestion(q);
+                                  setSelectedOption(o);
+                                }}
+                                title="Edit in sidebar"
+                              >
+                                <span className={styles.optionIndex}>
+                                  {i + 1}.
+                                </span>
+                                <span className={styles.optionText}>
+                                  {o.text?.trim() ? o.text : "Untitled option"}
+                                </span>
+                              </div>
+                            ))}
+                            <input
+                              type="text"
+                              className={styles.addOptionInput}
+                              placeholder="+ Add option"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedQuestion(q);
-                                setSelectedOption(o);
+                                addOption(q);
                               }}
-                              title="Edit in sidebar"
-                            >
-                              <span className={styles.optionIndex}>
-                                {i + 1}.
-                              </span>
-                              <span className={styles.optionText}>
-                                {o.text?.trim() ? o.text : "Untitled option"}
-                              </span>
-                            </div>
-                          ))}
-                          <input
-                            type="text"
-                            className={styles.addOptionInput}
-                            placeholder="+ Add option"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              addOption(q);
-                            }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
     </div>
   );
 };

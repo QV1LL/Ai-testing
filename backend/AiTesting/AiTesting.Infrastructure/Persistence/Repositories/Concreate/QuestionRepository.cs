@@ -10,16 +10,23 @@ internal class QuestionRepository(DbContext dbContext) : GenericRepository<Quest
     {
         base.UpdateAsync(entity, cancellationToken);
 
+        var optionsIds = DbContext.Set<AnswerOption>().Select(c => c.Id).ToList();
+
         foreach (var option in entity.Options)
         {
-            if (DbContext.Set<AnswerOption>().Any(o => o.Id == option.Id))
+            if (optionsIds.Contains(option.Id))
                 DbContext.Entry(option).State = EntityState.Modified;
             else
                 DbContext.Set<AnswerOption>().Add(option);
         }
 
         foreach (var correctAnswer in entity.CorrectAnswers)
-            DbContext.Entry(correctAnswer).State = EntityState.Modified;
+        {
+            if (optionsIds.Contains(correctAnswer.Id))
+                DbContext.Entry(correctAnswer).State = EntityState.Modified;
+            else
+                DbContext.Set<AnswerOption>().Add(correctAnswer);
+        }
 
         return Task.CompletedTask;
     }

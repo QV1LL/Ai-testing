@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getById,
+  updateQuestionsAndOptionsImages,
   updateTestData,
-  updateTestQuestionsWithImages,
+  updateTestQuestions,
 } from "../../api/testService";
 import styles from "./EditTestPage.module.css";
 import {
@@ -77,6 +78,55 @@ const EditTestPage: React.FC = () => {
   const handleSaveQuestions = async () => {
     if (!test) return;
 
+    let dto = getSaveQuestionsDto(questions);
+
+    if (dto == null) return;
+
+    const updatedQuestionsResultDto = await updateTestQuestions(dto);
+
+    const updatedQuestions = questions
+      .filter((q) => q.state !== QuestionState.Deleted)
+      .map((q) => {
+        const newQuestionId =
+          updatedQuestionsResultDto.questionTempToRegularIds[q.id];
+
+        const updatedOptions = q.options.map((o) => {
+          const newOptionId =
+            updatedQuestionsResultDto.optionTempToRegularIds[o.id];
+          return newOptionId ? { ...o, id: newOptionId } : o;
+        });
+
+        const updatedCorrectAnswers = q.correctAnswers.map((ca) => {
+          const newAnswerId =
+            updatedQuestionsResultDto.optionTempToRegularIds[ca.id];
+          return newAnswerId ? { ...ca, id: newAnswerId } : ca;
+        });
+
+        return {
+          ...q,
+          id: newQuestionId ?? q.id,
+          options: updatedOptions,
+          correctAnswers: updatedCorrectAnswers,
+        };
+      });
+
+    console.log(updatedQuestions);
+
+    setQuestions(
+      updatedQuestions.map((uq) => ({ ...uq, state: QuestionState.Unchanged }))
+    );
+    dto = getSaveQuestionsDto(updatedQuestions);
+
+    alert("Questions saved");
+
+    if (dto == null) return;
+
+    await updateQuestionsAndOptionsImages(dto);
+  };
+
+  const getSaveQuestionsDto = (
+    questions: EditableQuestionDto[]
+  ): UpdateQuestionsDto | null => {
     const questionsToAdd = questions.filter(
       (q) => q.state === QuestionState.Added
     );
@@ -94,25 +144,15 @@ const EditTestPage: React.FC = () => {
       questionsToUpdate.length === 0 &&
       questionsToDeleteIds.length === 0
     ) {
-      return;
+      return null;
     }
 
-    const dto: UpdateQuestionsDto = {
+    return {
       testId: test.id,
       questionsToAdd,
       questionsToUpdate,
       questionsToDeleteIds,
     };
-
-    await updateTestQuestionsWithImages(dto, fetchTest);
-
-    setQuestions((prev) =>
-      prev
-        .filter((q) => q.state !== QuestionState.Deleted)
-        .map((q) => ({ ...q, state: QuestionState.Unchanged }))
-    );
-
-    alert("Questions saved");
   };
 
   return (

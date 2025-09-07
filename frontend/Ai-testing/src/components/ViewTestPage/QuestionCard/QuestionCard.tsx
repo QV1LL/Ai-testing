@@ -25,7 +25,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, index }) => {
         />
       )}
 
-      <h3>
+      <h3 className={styles.title}>
         {index + 1}. {question.text || "Untitled Question"}
       </h3>
 

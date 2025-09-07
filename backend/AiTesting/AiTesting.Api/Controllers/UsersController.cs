@@ -42,10 +42,7 @@ public class UsersController : ControllerBase
         if (userIdResult.IsFailure)
             return Unauthorized(new { message = userIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _userProfileService.UpdateProfile(userIdResult.Value, dto, avatarImage, baseUrl);
+        var result = await _userProfileService.UpdateProfile(userIdResult.Value, dto, avatarImage);
 
         return result.IsSuccess ?
                NoContent() :
@@ -60,10 +57,7 @@ public class UsersController : ControllerBase
         if (userIdResult.IsFailure)
             return Unauthorized(new { message = userIdResult.Error });
 
-        var request = HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var result = await _userProfileService.DeleteProfile(userIdResult.Value, baseUrl);
+        var result = await _userProfileService.DeleteProfile(userIdResult.Value);
 
         return result.IsSuccess ?
                NoContent() :
