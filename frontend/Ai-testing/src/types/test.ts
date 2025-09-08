@@ -5,10 +5,18 @@ export interface CreateTestDto {
   timeLimitMinutes: number;
 }
 
-export interface TestDto {
+export interface TestMetadataDto {
   id: string;
   title: string;
   description?: string;
+}
+
+export interface TestPreviewDto {
+  id: string;
+  title: string;
+  description?: string;
+  coverImageUrl?: string;
+  timeLimitMinutes?: number;
 }
 
 export interface UpdateTestMetadataDto {
@@ -65,7 +73,7 @@ export interface UpdateOptionImageDto {
 }
 
 export interface UserTestsResultDto {
-  tests: TestDto[];
+  tests: TestMetadataDto[];
 }
 
 export enum QuestionType {

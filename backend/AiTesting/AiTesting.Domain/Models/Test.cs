@@ -1,7 +1,4 @@
 ﻿using AiTesting.Domain.Common;
-using AiTesting.Domain.Enums;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AiTesting.Domain.Models;
 

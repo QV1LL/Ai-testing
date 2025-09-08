@@ -3,13 +3,13 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import styles from "./MyTestsPage.module.css";
 import { getUserTests } from "../../api/testService";
-import type { TestDto } from "../../types/test";
+import type { TestMetadataDto } from "../../types/test";
 import { useNavigate } from "react-router-dom";
 
 const MyTestsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [allTests, setAllTests] = useState<TestDto[]>([]);
+  const [allTests, setAllTests] = useState<TestMetadataDto[]>([]);
   const testsPerPage = 9;
   const navigate = useNavigate();
 

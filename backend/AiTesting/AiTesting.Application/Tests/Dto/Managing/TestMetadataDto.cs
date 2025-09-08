@@ -1,6 +1,6 @@
 ﻿namespace AiTesting.Application.Tests.Dto.Managing;
 
-public record TestDto(
+public record TestMetadataDto(
     Guid Id,
     string Title,
     string? Description

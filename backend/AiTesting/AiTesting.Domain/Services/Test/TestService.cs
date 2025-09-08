@@ -1,4 +1,5 @@
 ﻿using AiTesting.Domain.Common;
+using AiTesting.Domain.Common.Specifications;
 using AiTesting.Domain.Common.Specifications.Test;
 using AiTesting.Domain.Models;
 using AiTesting.Domain.Repositories;
@@ -23,6 +24,15 @@ internal class TestService : ITestService
     public async Task<Result<Models.Test>> GetByIdAsync(Guid id)
     {
         var test = await _repository.GetByIdAsync(id, new TestWithFullQuestionsAndTestAttemptsSpecification());
+
+        return test == null ?
+               Result<Models.Test>.Failure("Test not found") :
+               Result<Models.Test>.Success(test);
+    }
+
+    public async Task<Result<Models.Test>> GetMetadataByIdAsync(Guid id)
+    {
+        var test = await _repository.GetByIdAsync(id, new DefaultSpecification<Models.Test>());
 
         return test == null ?
                Result<Models.Test>.Failure("Test not found") :

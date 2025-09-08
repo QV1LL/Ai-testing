@@ -6,9 +6,6 @@ using AiTesting.Domain.Services.Test;
 using AiTesting.Domain.Services.User;
 using AiTesting.Infrastructure.Services.Storage;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Extensions.Options;
-using System.Net;
 
 namespace AiTesting.Application.Tests.Services.Managing;
 
@@ -44,13 +41,13 @@ internal class TestManageService : ITestManageService
 
         var user = userResult.Value;
         var dto = new UserTestsResultDto(
-            Tests: [..user.Tests.Select(t => new TestDto(t.Id, t.Title, t.Description))]
+            Tests: [..user.Tests.Select(t => new TestMetadataDto(t.Id, t.Title, t.Description))]
         );
 
         return Result<UserTestsResultDto>.Success(dto);
     }
 
-    public async Task<Result<FullTestDto>> Get(Guid id)
+    public async Task<Result<FullTestDto>> GetFull(Guid id)
     {
         var testResult = await _testService.GetByIdAsync(id);
 
@@ -97,6 +94,29 @@ internal class TestManageService : ITestManageService
         );
 
         return Result<FullTestDto>.Success(dto);
+    }
+
+    public async Task<Result<TestPreviewDto>> GetPreview(Guid id)
+    {
+        var testResult = await _testService.GetMetadataByIdAsync(id);
+
+        if (testResult.IsFailure)
+            return Result<TestPreviewDto>.Failure(testResult.Error);
+
+        var test = testResult.Value;
+
+        if (!test.IsPublic)
+            return Result<TestPreviewDto>.Failure("Cannot get an unpublic test");
+
+        var testMetadataDto = new TestPreviewDto(
+            Id: test.Id,
+            Title: test.Title,
+            Description: test.Description,
+            CoverImageUrl: string.IsNullOrEmpty(test.CoverImageUrl) ? test.CoverImageUrl : $"{_httpContextAccessor.GetApiUrl()}{test.CoverImageUrl}",
+            TimeLimitMinutes: test.TimeLimitMinutes
+        );
+
+        return Result<TestPreviewDto>.Success(testMetadataDto);
     }
 
     public async Task<Result<CreateTestResultDto>> Create(CreateTestDto dto, IFormFile? coverImage, Guid ownerId)

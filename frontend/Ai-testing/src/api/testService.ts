@@ -1,7 +1,8 @@
 import type {
   CreateTestDto,
   FullTestDto,
-  TestDto,
+  TestMetadataDto,
+  TestPreviewDto,
   UpdateOptionDto,
   UpdateOptionImageDto,
   UpdateQuestionDto,
@@ -160,9 +161,14 @@ export const updateOptionImage = async (
   });
 };
 
-export const getUserTests = async (): Promise<TestDto[]> => {
+export const getUserTests = async (): Promise<TestMetadataDto[]> => {
   const res = await api.get<UserTestsResultDto>("/tests");
   return res.data.tests;
+};
+
+export const getTestPreview = async (id: string): Promise<TestPreviewDto> => {
+  const res = await api.get<TestPreviewDto>(`/tests/preview/${id}`);
+  return res.data;
 };
 
 export const getById = async (id: string): Promise<FullTestDto> => {
