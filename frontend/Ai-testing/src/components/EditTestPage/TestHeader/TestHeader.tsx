@@ -19,6 +19,15 @@ const TestHeader: React.FC<TestHeaderProps> = ({
   const [preview, setPreview] = useState<string | null>(initialPreview);
   const [coverImage, setCoverImage] = useState<File | null>(null);
 
+  const [isPublic, setIsPublic] = useState<boolean>(metadata.isPublic);
+  const [timeLimit, setTimeLimit] = useState<number | null>(
+    metadata.timeLimitInMinutes ?? null
+  );
+  const [hasTimeLimit, setHasTimeLimit] = useState<boolean>(
+    metadata.timeLimitInMinutes !== null &&
+      metadata.timeLimitInMinutes !== undefined
+  );
+
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,6 +47,8 @@ const TestHeader: React.FC<TestHeaderProps> = ({
       ...metadata,
       title: titleRef.current?.value ?? "",
       description: descRef.current?.value ?? "",
+      isPublic: isPublic,
+      timeLimitInMinutes: hasTimeLimit ? timeLimit : null,
       coverImage: coverImage,
     });
   };
@@ -67,6 +78,44 @@ const TestHeader: React.FC<TestHeaderProps> = ({
           defaultValue={metadata.description || ""}
           placeholder="No description"
         />
+
+        <div className={styles.settings}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+            />
+            Public test
+          </label>
+
+          <div className={styles.timeLimitWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={hasTimeLimit}
+                onChange={(e) => {
+                  setHasTimeLimit(e.target.checked);
+                  if (!e.target.checked) setTimeLimit(null);
+                  else setTimeLimit(metadata?.timeLimitInMinutes ?? null);
+                }}
+              />
+              Enable time limit
+            </label>
+
+            {hasTimeLimit && (
+              <input
+                type="number"
+                min={1}
+                value={timeLimit ?? ""}
+                onChange={(e) =>
+                  setTimeLimit(e.target.value ? Number(e.target.value) : null)
+                }
+                className={styles.timeLimitInput}
+              />
+            )}
+          </div>
+        </div>
 
         <DropZone onFileSelect={handleFile} />
       </div>

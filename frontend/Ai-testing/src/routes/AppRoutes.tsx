@@ -23,6 +23,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/docs" element={<DocumentationPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/pass-test/:id" element={<PassTestPage />} />
+      <Route path="/pass-test/attempt/:id" element={<PassTestPage />} />
 
       {/* Захищені сторінки */}
       <Route

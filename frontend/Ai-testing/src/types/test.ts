@@ -131,3 +131,8 @@ export interface FullTestDto {
   attemptsCount: number;
   averageScore: number;
 }
+
+export interface TestForAttemptDto {
+  id: string;
+  questions: QuestionDto[];
+}

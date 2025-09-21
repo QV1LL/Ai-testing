@@ -1,4 +1,5 @@
-﻿using AiTesting.Application.Tests.Services.Managing;
+﻿using AiTesting.Application.TestAttempts.Services.Managing;
+using AiTesting.Application.Tests.Services.Managing;
 using AiTesting.Application.Users.Services.Auth;
 using AiTesting.Application.Users.Services.Profile;
 using AiTesting.Application.Users.Services.RefreshToken;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<IUserProfileService, UserProfileService>();
 
         services.AddScoped<ITestManageService, TestManageService>();
+        services.AddScoped<ITestAttemptManageService, TestAttemptManageService>();
 
         return services;
     }

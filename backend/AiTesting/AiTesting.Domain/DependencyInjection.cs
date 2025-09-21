@@ -1,4 +1,5 @@
 ﻿using AiTesting.Domain.Services.Test;
+using AiTesting.Domain.Services.TestAttempt;
 using AiTesting.Domain.Services.User;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITestService, TestService>();
+        services.AddScoped<ITestAttemptService, TestAttemptService>();
 
         return services;
     }

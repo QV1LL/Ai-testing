@@ -63,6 +63,9 @@ export const updateTestData = async (
   const formData = new FormData();
   formData.append("id", dto.id);
   formData.append("title", dto.title);
+  formData.append("isPublic", `${dto.isPublic}`);
+  if (dto.timeLimitInMinutes)
+    formData.append("timeLimitInMinutes", `${dto.timeLimitInMinutes}`);
   if (dto.description) formData.append("description", dto.description);
   if (dto.coverImage) formData.append("coverImage", dto.coverImage);
 
