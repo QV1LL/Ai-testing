@@ -7,5 +7,7 @@ internal class TestWithFullQuestionsAndTestAttemptsSpecification : DefaultSpecif
         AddInclude("Questions.Options");
         AddInclude("Questions.CorrectAnswers");
         AddInclude("TestAttempts");
+        AddInclude("TestAttempts.Guest");
+        AddInclude("TestAttempts.User");
     }
 }

@@ -108,7 +108,6 @@ public class TestsController : ControllerBase
                 BadRequest(new { message = result.Error });
     }
 
-    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id)
     {

@@ -105,7 +105,7 @@
   gap: 16px;
 }
 
-.editButton {
+.startButton {
   padding: 0.5rem 1rem;
   background-color: #1e40af;
   color: white;
@@ -113,6 +113,12 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
+}
+
+.startButtonContent {
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
 .overlayFooter {
@@ -148,4 +154,11 @@
 .notFoundCard p {
   font-size: 1rem;
   line-height: 1.5;
+}
+
+.titleInput {
+  border-radius: 1rem;
+  border: 1px solid black;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }

@@ -1,15 +1,21 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PassTestPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import type { TestPreviewDto } from "../../types/test";
 import { getTestPreview } from "../../api/testService";
+import { getAccessToken } from "../../api/api";
+import { jwtDecode } from "jwt-decode";
 
 const PassTestPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [test, setTest] = useState<TestPreviewDto | null>(null);
   const [testFounded, setTestFounded] = useState<boolean | null>(null);
+
+  const [loggedUserName, setLoggedUserName] = useState<string | null>(null);
+  const [guestName, setGuestName] = useState<string>();
 
   useEffect(() => {
     const fetchTest = async () => {
@@ -24,7 +30,18 @@ const PassTestPage = () => {
         setTestFounded(false);
       }
     };
+
+    const fetchUserName = () => {
+      try {
+        const accessToken = getAccessToken();
+        const decoded: any = jwtDecode(accessToken ?? "");
+        console.log(decoded);
+        setLoggedUserName(decoded.name ?? null);
+      } catch {}
+    };
+
     fetchTest();
+    fetchUserName();
   }, [id]);
 
   if (testFounded === null)
@@ -51,10 +68,35 @@ const PassTestPage = () => {
                 </div>
 
                 <div className={styles.overlayFooter}>
-                  <button className={styles.editButton}>Start test</button>
+                  <button
+                    className={styles.startButton}
+                    onClick={() => {
+                      navigate(
+                        `/pass-test/attempt/${id}?guestName=${guestName ?? ""}`
+                      );
+                    }}
+                  >
+                    <div className={styles.startButtonContent}>
+                      <p>Start test as</p>
+                      {""}
+                      <p translate="no">
+                        {loggedUserName ? loggedUserName : guestName}
+                      </p>
+                    </div>
+                  </button>
                 </div>
               </div>
               <div className={styles.stats}>
+                {!loggedUserName && (
+                  <input
+                    type="text"
+                    value={guestName}
+                    placeholder="Guest name"
+                    onChange={(e) => setGuestName(e.target.value)}
+                    className={styles.titleInput}
+                    required
+                  />
+                )}
                 <p>
                   Time limit:{" "}
                   {test.timeLimitMinutes

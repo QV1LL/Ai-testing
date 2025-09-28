@@ -13,6 +13,7 @@ import CreateTestPage from "../pages/CreateTestPage/CreateTestPage";
 import EditTestPage from "../pages/EditTestPage/EditTestPage";
 import ViewTestPage from "../pages/ViewTestPage/ViewTestPage";
 import PassTestPage from "../pages/PassTestPage/PassTestPage";
+import CreateTestAttemptPage from "../pages/CreateTestAttemptPage/CreateTestAttemptPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -23,7 +24,10 @@ const AppRoutes: React.FC = () => {
       <Route path="/docs" element={<DocumentationPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/pass-test/:id" element={<PassTestPage />} />
-      <Route path="/pass-test/attempt/:id" element={<PassTestPage />} />
+      <Route
+        path="/pass-test/attempt/:id"
+        element={<CreateTestAttemptPage />}
+      />
 
       {/* Захищені сторінки */}
       <Route
