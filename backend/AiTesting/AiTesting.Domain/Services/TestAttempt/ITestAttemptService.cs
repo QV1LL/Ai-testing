@@ -4,5 +4,5 @@ namespace AiTesting.Domain.Services.TestAttempt;
 
 public interface ITestAttemptService
 {
-    Task<Result> AddAsync(Models.TestAttempt testAttempt);
+    Task<Result> AddAndFinishAsync(Models.TestAttempt testAttempt);
 }

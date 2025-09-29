@@ -6,5 +6,6 @@ public class UserWithTestsAndTestAttemptsSpecification : DefaultSpecification<Mo
     {
         AddInclude("Tests");
         AddInclude("TestAttempts");
+        AddInclude("TestAttempts.Test");
     }
 }

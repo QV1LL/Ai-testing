@@ -16,6 +16,7 @@ import type {
   AttemptAnswerDto,
 } from "../../types/testAttempt";
 import { jwtDecode } from "jwt-decode";
+import { getAccessToken } from "../../api/api";
 
 interface AnswerState {
   selectedOptionIds?: string[];
@@ -36,12 +37,13 @@ const CreateTestAttemptPage: React.FC = () => {
   const [guestName, setGuestName] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = getAccessToken();
 
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        setLoggedUserId(decoded.id || null);
+
+        setLoggedUserId(decoded.sub || null);
       } catch (error) {
         console.error("Error decoding token:", error);
       }

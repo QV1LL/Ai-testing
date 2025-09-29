@@ -32,7 +32,7 @@ internal class TestAttemptManageService : ITestAttemptManageService
             (dto.UserId == null && dto.GuestName == null))
             return Result.Failure("Test attempt cannot contain both guest name and user id and must include one of them");
 
-        var testResult = await _testService.GetMetadataByIdAsync(dto.TestId);
+        var testResult = await _testService.GetByIdAsync(dto.TestId);
 
         if (testResult.IsFailure) return testResult;
 
@@ -61,6 +61,25 @@ internal class TestAttemptManageService : ITestAttemptManageService
 
         if (testAttemptResult.IsFailure) return testAttemptResult;
 
-        return await _testAttemptService.AddAsync(testAttemptResult.Value);
+        var testAttempt = testAttemptResult.Value;
+
+        foreach (var answerDto in dto.Answers)
+        {
+            var answerResult = AttemptAnswer.Create
+            (
+                attempt: testAttempt,
+                question: test.Questions.FirstOrDefault(q => q.Id == answerDto.QuestionId),
+                selectedOptions: test.Questions.SelectMany(q => q.Options)
+                                               .Where(o => answerDto.SelectedOptions.Select(so => so.Id).Contains(o.Id))
+                                               .ToList(),
+                writtenAnswer: answerDto.WrittenAnswer
+            );
+
+            if (answerResult.IsFailure) return answerResult;
+
+            testAttempt.AddAnswer(answerResult.Value);
+        }
+
+        return await _testAttemptService.AddAndFinishAsync(testAttempt);
     }
 }

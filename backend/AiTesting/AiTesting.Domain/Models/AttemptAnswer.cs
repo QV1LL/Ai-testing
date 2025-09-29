@@ -10,7 +10,7 @@ public class AttemptAnswer
     public Question Question { get; private set; }
     public Guid QuestionId { get; private set; }
     public List<AnswerOption> SelectedOptions { get; private set; } = [];
-    public string WrittenAnswer { get; private set; }
+    public string? WrittenAnswer { get; private set; }
 
     protected AttemptAnswer() { }
 
@@ -18,7 +18,7 @@ public class AttemptAnswer
                           TestAttempt attempt, 
                           Question question, 
                           List<AnswerOption> selectedOptions = null!, 
-                          string writtenAnswer = null!)
+                          string? writtenAnswer = null!)
     {
         Id = id;
         Attempt = attempt;
@@ -30,7 +30,7 @@ public class AttemptAnswer
     public static Result<AttemptAnswer> Create(TestAttempt attempt, 
                                                Question question, 
                                                List<AnswerOption> selectedOptions = null!, 
-                                               string writtenAnswer = null!)
+                                               string? writtenAnswer = null!)
     {
         return Result<AttemptAnswer>.Success(
             new AttemptAnswer(Guid.NewGuid(), attempt, question, selectedOptions, writtenAnswer)

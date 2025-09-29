@@ -13,4 +13,50 @@ public class TestAttemptRepository(DbContext dbContext) : GenericRepository<Test
                               .AsNoTracking()
                               .ToListAsync(cancellationToken);
     }
+
+    public override async Task AddAsync(TestAttempt entity, CancellationToken cancellationToken = default)
+    {
+        await base.AddAsync(entity, cancellationToken);
+
+        foreach (var answer in entity.Answers)
+        {
+            DbContext.Set<AttemptAnswer>().Add(answer);
+
+            foreach (var option in answer.SelectedOptions)
+            {
+                DbContext.Set<AnswerOption>().Attach(option);
+            }
+        }
+    }
+
+
+    public override async Task UpdateAsync(TestAttempt entity, CancellationToken cancellationToken = default)
+    {
+        await base.UpdateAsync(entity, cancellationToken);
+
+        var answersIds = await DbContext.Set<AttemptAnswer>()
+                                        .Select(a => a.Id)
+                                        .ToListAsync(cancellationToken: cancellationToken);
+        
+        var optionsIds = await DbContext.Set<AnswerOption>()
+                                        .Select(o => o.Id)
+                                        .ToListAsync(cancellationToken: cancellationToken);
+
+        foreach (var answer in entity.Answers)
+        {
+            if (answersIds.Contains(answer.Id))
+                DbContext.Entry(answer).State = EntityState.Modified;
+            else
+                DbContext.Set<AttemptAnswer>().Add(answer);
+
+            foreach (var option in answer.SelectedOptions)
+            {
+                if (optionsIds.Contains(option.Id))
+                    DbContext.Entry(option).State = EntityState.Modified;
+                else
+                    DbContext.Set<AnswerOption>().Add(option);
+            }
+        }
+    }
+
 }
