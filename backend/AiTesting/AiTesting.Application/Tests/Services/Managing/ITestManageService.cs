@@ -8,7 +8,7 @@ public interface ITestManageService
 {
     Task<Result<UserTestsResultDto>> GetUserTests(Guid ownerId);
     Task<Result<FullTestDto>> GetFull(Guid id);
-    Task<Result<TestPreviewDto>> GetPreview(Guid id);
+    Task<Result<TestPreviewDto>> GetPreview(string joinId);
     Task<Result<CreateTestResultDto>> Create(CreateTestDto dto, IFormFile? coverImage, Guid ownerId);
     Task<Result> UpdateMetadata(UpdateTestMetadataDto dto, Guid ownerId);
     Task<Result<UpdateQuestionsResultDto>> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId);

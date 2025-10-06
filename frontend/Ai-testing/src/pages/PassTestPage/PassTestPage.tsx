@@ -72,7 +72,9 @@ const PassTestPage = () => {
                     className={styles.startButton}
                     onClick={() => {
                       navigate(
-                        `/pass-test/attempt/${id}?guestName=${guestName ?? ""}`
+                        `/pass-test/attempt/${test.id}?guestName=${
+                          guestName ?? ""
+                        }`
                       );
                     }}
                   >

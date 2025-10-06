@@ -30,9 +30,9 @@ internal class TestService : ITestService
                Result<Models.Test>.Success(test);
     }
 
-    public async Task<Result<Models.Test>> GetMetadataByIdAsync(Guid id)
+    public async Task<Result<Models.Test>> GetMetadataByJoinIdAsync(string id)
     {
-        var test = await _repository.GetByIdAsync(id, new DefaultSpecification<Models.Test>());
+        var test = await _repository.GetByJoinIdAsync(id, new DefaultSpecification<Models.Test>());
 
         return test == null ?
                Result<Models.Test>.Failure("Test not found") :
@@ -41,6 +41,8 @@ internal class TestService : ITestService
 
     public async Task<Result> AddAsync(Models.Test test)
     {
+        await EnsureUniqueJoinId(test);
+
         await _repository.AddAsync(test);
         await _unitOfWork.SaveChangesAsync();
 
@@ -89,5 +91,14 @@ internal class TestService : ITestService
 
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
+    }
+
+    private async Task EnsureUniqueJoinId(Models.Test test)
+    {
+        if (string.IsNullOrEmpty(test.JoinId))
+            test.GenerateNewJoinId();
+
+        while (await _repository.IsJoinIdExist(test.JoinId))
+            test.GenerateNewJoinId();
     }
 }

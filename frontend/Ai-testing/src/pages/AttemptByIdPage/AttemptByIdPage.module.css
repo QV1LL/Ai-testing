@@ -1,0 +1,46 @@
+/* General page container */
+.pageContainer {
+  padding: 50px 30px; /* more inner padding */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.8; /* more readable */
+  background: radial-gradient(#ddd 20%, #92b1da);
+}
+
+.contentContainer {
+  margin: 120px auto;
+  max-width: 1000px;
+}
+
+.joinTest {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.joinForm {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.joinForm input {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.joinForm input:focus {
+  border-color: #2a5298;
+}
+
+.joinForm button {
+  min-width: 100px;
+}

@@ -51,6 +51,9 @@ const ViewTestPage: React.FC = () => {
             <div className={styles.overlay}>
               <h1>{test.title}</h1>
               {test.description && <p>{test.description}</p>}
+              <p className={styles.JoinTestId}>
+                Test id: <u>{test.joinId}</u>
+              </p>
               <div className={styles.overlayFooter}>
                 <button
                   className={styles.editButton}

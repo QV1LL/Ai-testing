@@ -1,4 +1,6 @@
 ﻿using AiTesting.Domain.Common;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AiTesting.Domain.Models;
 
@@ -23,6 +25,7 @@ public class Test
     public Guid CreatedById { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public bool IsPublic { get; set; }
+    public string JoinId { get; private set; }
     public List<Question> Questions { get; private set; } = [];
     public List<TestAttempt> TestAttempts { get; private set; } = [];
     public int? TimeLimitMinutes
@@ -39,6 +42,9 @@ public class Test
             field = value;
         }
     }
+
+    private const int JOIN_ID_LENGTH = 6;
+    private const string CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     protected Test() { }
 
@@ -58,6 +64,8 @@ public class Test
         CreatedAt = DateTime.Now;
         IsPublic = isPublic;
         TimeLimitMinutes = timeLimitMinutes;
+
+        GenerateNewJoinId();
     }
 
     public static Result<Test> Create(string title, 
@@ -77,6 +85,19 @@ public class Test
         {
             return Result<Test>.Failure(ex.Message);
         }
+    }
+
+    public void GenerateNewJoinId()
+    {
+        var result = new StringBuilder(JOIN_ID_LENGTH);
+
+        for (int i = 0; i < JOIN_ID_LENGTH; i++)
+        {
+            int idx = RandomNumberGenerator.GetInt32(CHARSET.Length);
+            result.Append(CHARSET[idx]);
+        }
+
+        JoinId = result.ToString();
     }
 
     public Result AddQuestion(Question question)

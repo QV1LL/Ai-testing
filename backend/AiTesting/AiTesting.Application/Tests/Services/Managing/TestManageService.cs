@@ -62,6 +62,7 @@ internal class TestManageService : ITestManageService
             CoverImageUrl: string.IsNullOrEmpty(test.CoverImageUrl) ? test.CoverImageUrl : $"{_httpContextAccessor.GetApiUrl()}{test.CoverImageUrl}",
             IsPublic: test.IsPublic,
             TimeLimitMinutes: test.TimeLimitMinutes,
+            JoinId: test.JoinId,
             Questions: test.Questions.Select(q => new QuestionDto(
                     Id: q.Id,
                     Text: q.Text,
@@ -96,9 +97,9 @@ internal class TestManageService : ITestManageService
         return Result<FullTestDto>.Success(dto);
     }
 
-    public async Task<Result<TestPreviewDto>> GetPreview(Guid id)
+    public async Task<Result<TestPreviewDto>> GetPreview(string joinId)
     {
-        var testResult = await _testService.GetMetadataByIdAsync(id);
+        var testResult = await _testService.GetMetadataByJoinIdAsync(joinId);
 
         if (testResult.IsFailure)
             return Result<TestPreviewDto>.Failure(testResult.Error);

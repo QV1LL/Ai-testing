@@ -5,7 +5,8 @@ import { logout } from "./profileService";
 export const ACCESS_TOKEN_KEY = "access_token";
 export const REFRESH_TOKEN_KEY = "refresh_token";
 
-const BASE_URL = "http://192.168.110.54:5177/api";
+const appOrigin = window.location.origin;
+const BASE_URL = `${appOrigin.replace(":5173", ":5177")}/api`;
 
 export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
 export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);

@@ -126,6 +126,7 @@ export interface FullTestDto {
   coverImageUrl?: string;
   isPublic: boolean;
   timeLimitMinutes?: number;
+  joinId: string;
   questions: QuestionDto[];
   testAttempts: TestAttemptDto[];
   attemptsCount: number;

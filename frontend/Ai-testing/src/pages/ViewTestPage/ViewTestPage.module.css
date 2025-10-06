@@ -164,3 +164,7 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.JoinTestId {
+  padding-top: 0.5rem;
+}

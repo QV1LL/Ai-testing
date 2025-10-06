@@ -7,6 +7,7 @@ public record FullTestDto(
     string? CoverImageUrl,
     bool IsPublic,
     int? TimeLimitMinutes,
+    string JoinId,
     List<QuestionDto> Questions,
     List<TestAttemptDto> TestAttempts,
     int AttemptsCount,

@@ -118,10 +118,10 @@ public class TestsController : ControllerBase
         return Ok(result.Value);
     }
 
-    [HttpGet("preview/{id}")]
-    public async Task<IActionResult> GetTestPreview(Guid id)
+    [HttpGet("preview/{joinId}")]
+    public async Task<IActionResult> GetTestPreview(string joinId)
     {
-        var result = await _testManageService.GetPreview(id);
+        var result = await _testManageService.GetPreview(joinId);
 
         if (result.IsFailure) return NotFound(result.Error);
 
