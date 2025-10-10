@@ -1,4 +1,5 @@
 ﻿using AiTesting.Domain.Common;
+using AiTesting.Domain.Common.Specifications;
 using AiTesting.Domain.Common.Specifications.Test;
 using AiTesting.Domain.Repositories;
 
@@ -19,12 +20,42 @@ internal class TestAttemptService : ITestAttemptService
         _testRepository = testRepository;
     }
 
-    public async Task<Result> AddAndFinishAsync(Models.TestAttempt testAttempt)
+    public async Task<Result<Models.TestAttempt>> GetByIdAsync(Guid id)
+    {
+        var testAttempt = await _repository.GetByIdAsync(id, new DefaultSpecification<Models.TestAttempt>());
+
+        if (testAttempt == null)
+            return Result<Models.TestAttempt>.Failure("Attempt not found");
+
+        return Result<Models.TestAttempt>.Success(testAttempt);
+    }
+
+    public async Task<Result> AddAsync(Models.TestAttempt testAttempt)
+    {
+        await _repository.AddAsync(testAttempt);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> FinishAsync(Models.TestAttempt testAttempt)
     {
         var test = await _testRepository.GetByIdAsync(testAttempt.Test.Id, new TestWithQuestionsSpecification());
 
         if (test == null)
-            return Result.Failure("Test wasn`t found");
+        {
+            await _repository.DeleteAsync(testAttempt);
+            return Result.Failure("Test wasn`t found, attempt failed");
+        }
+
+        var attemptTime = (DateTimeOffset.Now - testAttempt.StartedAt).TotalSeconds;
+        var maxAttemptTime = test.TimeLimitMinutes == null ? test.TimeLimitMinutes * 60 : int.MaxValue;
+
+        if (attemptTime > maxAttemptTime)
+        {
+            await _repository.DeleteAsync(testAttempt);
+            return Result.Failure("Test attempt is expired, attempt failed");
+        }
 
         var score = CalculateScore(testAttempt, test);
         testAttempt.Finish(score);
@@ -77,5 +108,4 @@ internal class TestAttemptService : ITestAttemptService
         if (totalCorrectAnswers == 0) return 0;
         return (double)userCorrectAnswers / totalCorrectAnswers * 100.0;
     }
-
 }

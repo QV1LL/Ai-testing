@@ -124,3 +124,17 @@
   border-radius: 4px;
   margin-left: 0.5rem;
 }
+
+.timerBar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 60, 114, 0.95);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 1.5rem 1.5rem 0 0;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+}

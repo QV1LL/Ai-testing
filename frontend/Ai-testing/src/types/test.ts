@@ -113,7 +113,8 @@ export interface EditableQuestionDto extends UpdateQuestionDto {
 
 export interface TestAttemptDto {
   id: string;
-  userId: string;
+  userDisplayName: string;
+  userAvatarUrl: string;
   score: number;
   startedAt: Date;
   finishedAt?: Date;

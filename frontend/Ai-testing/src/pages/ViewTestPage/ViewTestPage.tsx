@@ -110,8 +110,128 @@ const ViewTestPage: React.FC = () => {
               )
             ) : (
               <div className={styles.stats}>
-                <p>Total attempts: {test.attemptsCount}</p>
-                <p>Average score: {test.averageScore.toFixed(2)}%</p>
+                <div className={styles.kpiGrid}>
+                  <div className={styles.kpiCard}>
+                    <p className={styles.kpiLabel}>Total attempts</p>
+                    <p className={styles.kpiValue}>{test.attemptsCount}</p>
+                  </div>
+
+                  <div className={styles.kpiCard}>
+                    <p className={styles.kpiLabel}>Average score</p>
+                    <p className={styles.kpiValue}>
+                      {test.averageScore.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  <div className={styles.kpiCard}>
+                    <p className={styles.kpiLabel}>Highest score</p>
+                    <p className={styles.kpiValue}>
+                      {test.testAttempts.length > 0
+                        ? `${Math.max(
+                            ...test.testAttempts.map((a) => a.score)
+                          )}%`
+                        : "—"}
+                    </p>
+                  </div>
+
+                  <div className={styles.kpiCard}>
+                    <p className={styles.kpiLabel}>Lowest score</p>
+                    <p className={styles.kpiValue}>
+                      {test.testAttempts.length > 0
+                        ? `${Math.min(
+                            ...test.testAttempts.map((a) => a.score)
+                          )}%`
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.tableWrapper}>
+                  {/* Desktop table */}
+                  <table className={styles.statsTable}>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Score</th>
+                        <th>Started</th>
+                        <th>Finished</th>
+                        <th>Duration</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {test.testAttempts
+                        .sort((a, b) => b.score - a.score)
+                        .map((attempt, index) => (
+                          <tr key={attempt.id}>
+                            <td>{index + 1}</td>
+                            <td>{attempt.userDisplayName}</td>
+                            <td>{attempt.score}%</td>
+                            <td>
+                              {new Date(attempt.startedAt).toLocaleString()}
+                            </td>
+                            <td>
+                              {attempt.finishedAt
+                                ? new Date(attempt.finishedAt).toLocaleString()
+                                : "—"}
+                            </td>
+                            <td>
+                              {attempt.finishedAt && attempt.startedAt
+                                ? Math.round(
+                                    (new Date(attempt.finishedAt).getTime() -
+                                      new Date(attempt.startedAt).getTime()) /
+                                      1000 /
+                                      60
+                                  ) + " min"
+                                : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+
+                  {/* Mobile cards */}
+                  <div className={styles.statsCards}>
+                    {test.testAttempts.map((attempt, index) => (
+                      <div className={styles.statsCard} key={attempt.id}>
+                        <p className={styles.label}>#</p>
+                        <p className={styles.value}>{index + 1}</p>
+
+                        <p className={styles.label}>Username</p>
+                        <p className={styles.value}>
+                          {attempt.userDisplayName}
+                        </p>
+
+                        <p className={styles.label}>Score</p>
+                        <p className={styles.value}>{attempt.score}%</p>
+
+                        <p className={styles.label}>Started</p>
+                        <p className={styles.value}>
+                          {new Date(attempt.startedAt).toLocaleString()}
+                        </p>
+
+                        <p className={styles.label}>Finished</p>
+                        <p className={styles.value}>
+                          {attempt.finishedAt
+                            ? new Date(attempt.finishedAt).toLocaleString()
+                            : "—"}
+                        </p>
+
+                        <p className={styles.label}>Duration</p>
+                        <p className={styles.value}>
+                          {attempt.finishedAt && attempt.startedAt
+                            ? Math.round(
+                                (new Date(attempt.finishedAt).getTime() -
+                                  new Date(attempt.startedAt).getTime()) /
+                                  1000 /
+                                  60
+                              ) + " min"
+                            : "—"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>

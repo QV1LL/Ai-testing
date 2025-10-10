@@ -26,15 +26,33 @@ internal class TestAttemptManageService : ITestAttemptManageService
         _testService = testService;
     }
 
-    public async Task<Result> AddTestAttempt(AddTestAttemptDto dto)
+    public async Task<Result<TestAttemptMetadataDto>> GetById(Guid id)
+    {
+        var testAttemptResult = await _testAttemptService.GetByIdAsync(id);
+
+        if (testAttemptResult.IsFailure)
+            return Result<TestAttemptMetadataDto>.Failure(testAttemptResult.Error);
+
+        var testAttempt = testAttemptResult.Value;
+        var testAttemptMetadataDto = new TestAttemptMetadataDto
+        (
+            TestId: testAttempt.TestId,
+            GuestName: testAttempt.Guest?.DisplayName
+        );
+
+        return Result<TestAttemptMetadataDto>.Success(testAttemptMetadataDto);
+    }
+
+    public async Task<Result<AddTestAttemptResultDto>> AddTestAttempt(AddTestAttemptDto dto)
     {
         if ((dto.UserId != null && dto.GuestName != null) ||
             (dto.UserId == null && dto.GuestName == null))
-            return Result.Failure("Test attempt cannot contain both guest name and user id and must include one of them");
+            return Result<AddTestAttemptResultDto>.Failure("Test attempt cannot contain both guest name and user id and must include one of them");
 
         var testResult = await _testService.GetByIdAsync(dto.TestId);
 
-        if (testResult.IsFailure) return testResult;
+        if (testResult.IsFailure) 
+            return Result<AddTestAttemptResultDto>.Failure(testResult.Error);
 
         Guest? guest = null;
         var userResult = await _userService.GetByIdAsync(dto.UserId ?? Guid.Empty);
@@ -44,12 +62,14 @@ internal class TestAttemptManageService : ITestAttemptManageService
         {
             var guestResult = Guest.Create(dto.GuestName!);
 
-            if (guestResult.IsFailure) return guestResult;
+            if (guestResult.IsFailure) 
+                return Result<AddTestAttemptResultDto>.Failure(guestResult.Error);
             
             guest = guestResult.Value;
             var result = await _guestService.AddAsync(guest);
 
-            if (result.IsFailure) return result;
+            if (result.IsFailure) 
+                return Result<AddTestAttemptResultDto>.Failure(result.Error);
         }
 
         var testAttemptResult = TestAttempt.Create
@@ -59,9 +79,34 @@ internal class TestAttemptManageService : ITestAttemptManageService
             guest
         );
 
-        if (testAttemptResult.IsFailure) return testAttemptResult;
+        if (testAttemptResult.IsFailure) 
+            return Result<AddTestAttemptResultDto>.Failure(testAttemptResult.Error);
 
         var testAttempt = testAttemptResult.Value;
+        var addResult = await _testAttemptService.AddAsync(testAttempt);
+
+        if (addResult.IsFailure)
+            return Result<AddTestAttemptResultDto>.Failure(addResult.Error);
+
+        var addTestAttemptResultDto = new AddTestAttemptResultDto(AttemptId: testAttempt.Id);
+
+        return Result<AddTestAttemptResultDto>.Success(addTestAttemptResultDto);
+    }
+
+    public async Task<Result<TestAttemptResultDto>> FinishTestAttempt(FinishTestAttemptDto dto)
+    {
+        var testAttemptResult = await _testAttemptService.GetByIdAsync(dto.AttemptId);
+
+        if (testAttemptResult.IsFailure)
+            return Result<TestAttemptResultDto>.Failure(testAttemptResult.Error);
+
+        var testAttempt = testAttemptResult.Value;
+        var testResult = await _testService.GetByIdAsync(testAttempt.TestId);
+
+        if (testResult.IsFailure)
+            return Result<TestAttemptResultDto>.Failure(testResult.Error);
+
+        var test = testResult.Value;
 
         foreach (var answerDto in dto.Answers)
         {
@@ -75,11 +120,28 @@ internal class TestAttemptManageService : ITestAttemptManageService
                 writtenAnswer: answerDto.WrittenAnswer
             );
 
-            if (answerResult.IsFailure) return answerResult;
+            if (answerResult.IsFailure)
+                return Result<TestAttemptResultDto>.Failure(answerResult.Error);
 
             testAttempt.AddAnswer(answerResult.Value);
         }
 
-        return await _testAttemptService.AddAndFinishAsync(testAttempt);
+        var finishResult = await _testAttemptService.FinishAsync(testAttempt);
+
+        if (finishResult.IsFailure)
+            return Result<TestAttemptResultDto>.Failure(finishResult.Error);
+
+        var testAttemptResultDto = new TestAttemptResultDto
+        (
+            TestTitle: test.Title,
+            DisplayUsername: testAttempt.User == null ?
+                             testAttempt.Guest.DisplayName :
+                             testAttempt.User.DisplayName,
+            StartedAt: testAttempt.StartedAt,
+            FinishedAt: testAttempt.FinishedAt ?? new(),
+            Score: testAttempt.Score
+        );
+
+        return Result<TestAttemptResultDto>.Success(testAttemptResultDto);
     }
 }

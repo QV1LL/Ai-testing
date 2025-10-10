@@ -12,9 +12,10 @@ import AuthPage from "../pages/AuthPage/AuthPage";
 import CreateTestPage from "../pages/CreateTestPage/CreateTestPage";
 import EditTestPage from "../pages/EditTestPage/EditTestPage";
 import ViewTestPage from "../pages/ViewTestPage/ViewTestPage";
-import PassTestPage from "../pages/PassTestPage/PassTestPage";
-import CreateTestAttemptPage from "../pages/CreateTestAttemptPage/CreateTestAttemptPage";
+import StartTestPage from "../pages/StartTestPage/StartTestPage";
+import PassTestAttemptPage from "../pages/PassTestAttemptPage/PassTestAttemptPage";
 import AttemptByIdPage from "../pages/AttemptByIdPage/AttemptByIdPage";
+import ViewTestAttemptResults from "../pages/ViewTestAttemptResults/ViewTestAttemptsResults";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -25,11 +26,9 @@ const AppRoutes: React.FC = () => {
       <Route path="/docs" element={<DocumentationPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/attempt" element={<AttemptByIdPage />} />
-      <Route path="/pass-test/:id" element={<PassTestPage />} />
-      <Route
-        path="/pass-test/attempt/:id"
-        element={<CreateTestAttemptPage />}
-      />
+      <Route path="/test-attempt/result" element={<ViewTestAttemptResults />} />
+      <Route path="/pass-test/:id" element={<StartTestPage />} />
+      <Route path="/pass-test/attempt/:id" element={<PassTestAttemptPage />} />
 
       {/* Захищені сторінки */}
       <Route

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getById } from "../../api/testService";
-import styles from "./CreateTestAttemptPage.module.css";
+import styles from "./PassTestAttemptPage.module.css";
 import {
   QuestionType,
   type FullTestDto,
@@ -10,10 +10,11 @@ import {
 } from "../../types/test";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { createAttempt } from "../../api/testAttemptService";
+import { finishAttempt, getAttemptById } from "../../api/testAttemptService";
 import type {
-  AddTestAttemptDto,
   AttemptAnswerDto,
+  FinishTestAttemptDto,
+  TestAttemptMetadataDto,
 } from "../../types/testAttempt";
 import { jwtDecode } from "jwt-decode";
 import { getAccessToken } from "../../api/api";
@@ -23,51 +24,83 @@ interface AnswerState {
   writtenAnswer?: string;
 }
 
-const CreateTestAttemptPage: React.FC = () => {
+const PassTestAttemptPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
 
+  const [testAttempt, setTestAttempt] = useState<TestAttemptMetadataDto | null>(
+    null
+  );
   const [test, setTest] = useState<FullTestDto | null>(null);
   const [answers, setAnswers] = useState<{ [questionId: string]: AnswerState }>(
     {}
   );
   const [loading, setLoading] = useState(true);
   const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
-  const [guestName, setGuestName] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-
-        setLoggedUserId(decoded.sub || null);
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    } else {
-      const queryParams = new URLSearchParams(location.search);
-      const guestNameFromUrl = queryParams.get("guestName") || null;
-      if (guestNameFromUrl) {
-        setGuestName(guestNameFromUrl);
-      }
-    }
-
-    const fetchTest = async () => {
+    const fetchTestAttempt = async () => {
       if (!id) return;
       try {
-        const data = await getById(id);
-        setTest(data);
+        const data = await getAttemptById(id);
+        setTestAttempt(data);
+        fetchTest();
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     };
-    fetchTest();
+
+    const fetchTest = async () => {
+      if (!id) return;
+      try {
+        const data = await getById(id);
+        setTest(data);
+        if (data.timeLimitMinutes) {
+          setRemainingTime(data.timeLimitMinutes * 60);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUserId = async () => {
+      const token = getAccessToken();
+      if (token) {
+        try {
+          const decoded: any = jwtDecode(token);
+          setLoggedUserId(decoded.sub || null);
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    };
+
+    fetchTestAttempt();
+    fetchUserId();
   }, [id]);
+
+  useEffect(() => {
+    if (remainingTime === null || remainingTime <= 0) return;
+
+    const timer = setInterval(() => {
+      setRemainingTime((prev) => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleSubmit(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [remainingTime]);
 
   const handleSelect = (qId: string, optionId: string, multiple: boolean) => {
     setAnswers((prev) => {
@@ -84,28 +117,19 @@ const CreateTestAttemptPage: React.FC = () => {
 
       return {
         ...prev,
-        [qId]: {
-          ...prevAnswer,
-          selectedOptionIds,
-        },
+        [qId]: { ...prevAnswer, selectedOptionIds },
       };
     });
   };
 
   const handleText = (qId: string, text: string) => {
-    setAnswers((prev) => {
-      const prevAnswer = prev[qId] || {};
-      return {
-        ...prev,
-        [qId]: {
-          ...prevAnswer,
-          writtenAnswer: text || undefined,
-        },
-      };
-    });
+    setAnswers((prev) => ({
+      ...prev,
+      [qId]: { ...prev[qId], writtenAnswer: text || undefined },
+    }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (auto = false) => {
     if (!id || !test) return;
     try {
       const answerDtos: AttemptAnswerDto[] = Object.entries(answers).map(
@@ -127,17 +151,17 @@ const CreateTestAttemptPage: React.FC = () => {
         }
       );
 
-      const dto: AddTestAttemptDto = {
-        testId: id,
-        userId: loggedUserId || undefined,
-        guestName: guestName === null ? undefined : guestName,
-        startedAt: new Date(),
+      const dto: FinishTestAttemptDto = {
+        attemptId: id,
         answers: answerDtos,
       };
 
-      await createAttempt(dto);
-      console.log("Test attempt submitted successfully");
-      navigate("/");
+      if (auto) {
+        alert("⏰ Time’s up! Your answers are being submitted automatically.");
+      }
+
+      const result = await finishAttempt(dto);
+      navigate("/test-attempt/result", { state: result });
     } catch (error) {
       console.error("Failed to submit attempt:", error);
     }
@@ -149,6 +173,12 @@ const CreateTestAttemptPage: React.FC = () => {
   const sortedQuestions = [...test.questions].sort(
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className={styles.createTestAttemptPage}>
@@ -170,7 +200,7 @@ const CreateTestAttemptPage: React.FC = () => {
           </div>
 
           <div className={styles.content}>
-            {!loggedUserId && !guestName ? (
+            {!loggedUserId && !testAttempt?.guestName ? (
               <div className={styles.noQuestions}>
                 <h3>Access Denied</h3>
                 <p>
@@ -188,7 +218,7 @@ const CreateTestAttemptPage: React.FC = () => {
                     {q.imageUrl && (
                       <img
                         src={q.imageUrl}
-                        alt={`Question ${idx + 1} image`}
+                        alt={`Question ${idx + 1}`}
                         className={styles.questionImage}
                       />
                     )}
@@ -228,7 +258,7 @@ const CreateTestAttemptPage: React.FC = () => {
                               {opt.imageUrl && (
                                 <img
                                   src={opt.imageUrl}
-                                  alt={`Option ${opt.text} image`}
+                                  alt={`Option ${opt.text}`}
                                   className={styles.optionImage}
                                 />
                               )}
@@ -251,7 +281,7 @@ const CreateTestAttemptPage: React.FC = () => {
                 <div style={{ textAlign: "center", marginTop: "2rem" }}>
                   <button
                     className={styles.submitButton}
-                    onClick={handleSubmit}
+                    onClick={() => handleSubmit()}
                   >
                     Submit Answers
                   </button>
@@ -261,9 +291,16 @@ const CreateTestAttemptPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {remainingTime !== null && (
+        <div className={styles.timerBar}>
+          <span>⏰ Time left: {formatTime(remainingTime)}</span>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
 };
 
-export default CreateTestAttemptPage;
+export default PassTestAttemptPage;

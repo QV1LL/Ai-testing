@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import styles from "./PassTestPage.module.css";
+import styles from "./StartTestPage.module.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
@@ -7,13 +7,16 @@ import type { TestPreviewDto } from "../../types/test";
 import { getTestPreview } from "../../api/testService";
 import { getAccessToken } from "../../api/api";
 import { jwtDecode } from "jwt-decode";
+import { createAttempt } from "../../api/testAttemptService";
+import type { AddTestAttemptDto } from "../../types/testAttempt";
 
-const PassTestPage = () => {
+const StartTestPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [test, setTest] = useState<TestPreviewDto | null>(null);
   const [testFounded, setTestFounded] = useState<boolean | null>(null);
 
+  const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
   const [loggedUserName, setLoggedUserName] = useState<string | null>(null);
   const [guestName, setGuestName] = useState<string>();
 
@@ -31,18 +34,34 @@ const PassTestPage = () => {
       }
     };
 
-    const fetchUserName = () => {
+    const fetchUserMetadata = () => {
       try {
         const accessToken = getAccessToken();
         const decoded: any = jwtDecode(accessToken ?? "");
-        console.log(decoded);
         setLoggedUserName(decoded.name ?? null);
+        setLoggedUserId(decoded.sub ?? null);
       } catch {}
     };
 
     fetchTest();
-    fetchUserName();
+    fetchUserMetadata();
   }, [id]);
+
+  const HandleStartTestAttempt = async () => {
+    if (test === null) return;
+
+    const dto: AddTestAttemptDto = {
+      testId: id ?? "",
+      userId: loggedUserId || undefined,
+      guestName: guestName === null ? undefined : guestName,
+      startedAt: new Date(),
+    };
+
+    const attemptAddResultDto = await createAttempt(dto);
+    const attemptId = attemptAddResultDto.attemptId;
+
+    navigate(`/pass-test/attempt/${attemptId}`);
+  };
 
   if (testFounded === null)
     return <div className={styles.loader}>Loading...</div>;
@@ -70,13 +89,7 @@ const PassTestPage = () => {
                 <div className={styles.overlayFooter}>
                   <button
                     className={styles.startButton}
-                    onClick={() => {
-                      navigate(
-                        `/pass-test/attempt/${test.id}?guestName=${
-                          guestName ?? ""
-                        }`
-                      );
-                    }}
+                    onClick={HandleStartTestAttempt}
                   >
                     <div className={styles.startButtonContent}>
                       <p>Start test as</p>
@@ -123,4 +136,4 @@ const PassTestPage = () => {
   );
 };
 
-export default PassTestPage;
+export default StartTestPage;

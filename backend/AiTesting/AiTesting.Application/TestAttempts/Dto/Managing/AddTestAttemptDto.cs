@@ -5,6 +5,5 @@ public record AddTestAttemptDto
     Guid TestId,
     Guid? UserId,
     string? GuestName,
-    DateTimeOffset StartedAt,
-    List<AttemptAnswerDto> Answers
+    DateTimeOffset StartedAt
 );
