@@ -30,6 +30,15 @@ internal class TestService : ITestService
                Result<Models.Test>.Success(test);
     }
 
+    public async Task<Result<Models.Test>> GetByJoinIdAsync(string id)
+    {
+        var test = await _repository.GetByJoinIdAsync(id, new TestWithFullQuestionsAndTestAttemptsSpecification());
+
+        return test == null ?
+               Result<Models.Test>.Failure("Test not found") :
+               Result<Models.Test>.Success(test);
+    }
+
     public async Task<Result<Models.Test>> GetMetadataByJoinIdAsync(string id)
     {
         var test = await _repository.GetByJoinIdAsync(id, new DefaultSpecification<Models.Test>());

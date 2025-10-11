@@ -49,7 +49,7 @@ internal class TestAttemptManageService : ITestAttemptManageService
             (dto.UserId == null && dto.GuestName == null))
             return Result<AddTestAttemptResultDto>.Failure("Test attempt cannot contain both guest name and user id and must include one of them");
 
-        var testResult = await _testService.GetByIdAsync(dto.TestId);
+        var testResult = await _testService.GetByJoinIdAsync(dto.TestJoinId);
 
         if (testResult.IsFailure) 
             return Result<AddTestAttemptResultDto>.Failure(testResult.Error);

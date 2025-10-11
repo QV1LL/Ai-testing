@@ -105,7 +105,11 @@ const AuthPage: React.FC = () => {
             {error && <p className={styles.errorText}>{error}</p>}
 
             <p className={styles.toggleText}>
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+              <span>
+                {isSignUp
+                  ? "Already have an account?"
+                  : "Don't have an account?"}{" "}
+              </span>
               <span
                 className={styles.toggleLink}
                 onClick={() => {

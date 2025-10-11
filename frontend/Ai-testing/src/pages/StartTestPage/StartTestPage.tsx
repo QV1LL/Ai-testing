@@ -16,9 +16,10 @@ const StartTestPage = () => {
   const [test, setTest] = useState<TestPreviewDto | null>(null);
   const [testFounded, setTestFounded] = useState<boolean | null>(null);
 
+  const [showError, setShowError] = useState<boolean>(false);
   const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
   const [loggedUserName, setLoggedUserName] = useState<string | null>(null);
-  const [guestName, setGuestName] = useState<string>();
+  const [guestName, setGuestName] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTest = async () => {
@@ -47,11 +48,16 @@ const StartTestPage = () => {
     fetchUserMetadata();
   }, [id]);
 
-  const HandleStartTestAttempt = async () => {
+  const handleStartTestAttempt = async () => {
     if (test === null) return;
 
+    if (loggedUserId === null && guestName === null) {
+      setShowError(true);
+      return;
+    }
+
     const dto: AddTestAttemptDto = {
-      testId: id ?? "",
+      testJoinId: id ?? "",
       userId: loggedUserId || undefined,
       guestName: guestName === null ? undefined : guestName,
       startedAt: new Date(),
@@ -89,33 +95,42 @@ const StartTestPage = () => {
                 <div className={styles.overlayFooter}>
                   <button
                     className={styles.startButton}
-                    onClick={HandleStartTestAttempt}
+                    onClick={handleStartTestAttempt}
                   >
                     <div className={styles.startButtonContent}>
-                      <p>Start test as</p>
-                      {""}
-                      <p translate="no">
+                      <span>Start test as</span>{" "}
+                      <span translate="no">
                         {loggedUserName ? loggedUserName : guestName}
-                      </p>
+                      </span>
                     </div>
                   </button>
                 </div>
               </div>
               <div className={styles.stats}>
                 {!loggedUserName && (
-                  <input
-                    type="text"
-                    value={guestName}
-                    placeholder="Guest name"
-                    onChange={(e) => setGuestName(e.target.value)}
-                    className={styles.titleInput}
-                    required
-                  />
+                  <>
+                    <input
+                      type="text"
+                      value={guestName ?? ""}
+                      placeholder="Guest name"
+                      onChange={(e) => {
+                        setGuestName(e.target.value);
+                        setShowError(false);
+                      }}
+                      className={styles.titleInput}
+                      required
+                    />
+                    {showError && (
+                      <p className={styles.errorText}>
+                        Please enter your name before starting the test.
+                      </p>
+                    )}
+                  </>
                 )}
                 <p>
                   Time limit:{" "}
                   {test.timeLimitMinutes
-                    ? test.timeLimitMinutes
+                    ? test.timeLimitMinutes + " min"
                     : "No time limit"}
                 </p>
               </div>

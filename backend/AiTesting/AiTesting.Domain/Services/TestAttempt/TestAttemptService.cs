@@ -1,6 +1,6 @@
 ﻿using AiTesting.Domain.Common;
-using AiTesting.Domain.Common.Specifications;
 using AiTesting.Domain.Common.Specifications.Test;
+using AiTesting.Domain.Common.Specifications.TestAttempt;
 using AiTesting.Domain.Repositories;
 
 namespace AiTesting.Domain.Services.TestAttempt;
@@ -22,9 +22,9 @@ internal class TestAttemptService : ITestAttemptService
 
     public async Task<Result<Models.TestAttempt>> GetByIdAsync(Guid id)
     {
-        var testAttempt = await _repository.GetByIdAsync(id, new DefaultSpecification<Models.TestAttempt>());
+        var testAttempt = await _repository.GetByIdAsync(id, new TestAttemptWithGuest());
 
-        if (testAttempt == null)
+        if (testAttempt == null || testAttempt.FinishedAt != null)
             return Result<Models.TestAttempt>.Failure("Attempt not found");
 
         return Result<Models.TestAttempt>.Success(testAttempt);
@@ -60,7 +60,7 @@ internal class TestAttemptService : ITestAttemptService
         var score = CalculateScore(testAttempt, test);
         testAttempt.Finish(score);
 
-        await _repository.AddAsync(testAttempt);
+        await _repository.UpdateAsync(testAttempt);
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();

@@ -37,7 +37,10 @@ const ProfileCardSection: React.FC<ProfileCardProps> = ({
 
           <div className={styles.userInfoWrapper}>
             <h1 className={styles.heading}>
-              Welcome, <span className={styles.noTranslate}>{name}</span>
+              Welcome,{" "}
+              <span translate="no" className={styles.noTranslate}>
+                {name}
+              </span>
             </h1>
 
             <p className={styles.email}>{email}</p>

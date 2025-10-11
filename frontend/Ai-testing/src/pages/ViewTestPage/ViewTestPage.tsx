@@ -11,6 +11,8 @@ const ViewTestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [test, setTest] = useState<FullTestDto | null>(null);
+
+  const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState<"questions" | "stats">("questions");
 
   useEffect(() => {
@@ -26,6 +28,28 @@ const ViewTestPage: React.FC = () => {
     };
     fetchTest();
   }, [id]);
+
+  const handleCopyJoinId = async () => {
+    if (!test?.joinId) return;
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(test.joinId);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = test.joinId;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   if (!test) return <div className={styles.loader}>Loading...</div>;
 
@@ -49,11 +73,22 @@ const ViewTestPage: React.FC = () => {
             }}
           >
             <div className={styles.overlay}>
-              <h1>{test.title}</h1>
-              {test.description && <p>{test.description}</p>}
-              <p className={styles.JoinTestId}>
-                Test id: <u>{test.joinId}</u>
-              </p>
+              <div className={styles.overlayItems}>
+                <h1>{test.title}</h1>
+                {test.description && <p>{test.description}</p>}
+                <p className={styles.JoinTestId}>
+                  Test ID:{" "}
+                  <button
+                    onClick={handleCopyJoinId}
+                    className={styles.copyButton}
+                  >
+                    {test.joinId}
+                  </button>
+                  {copied && (
+                    <span className={styles.copiedMessage}>Copied!</span>
+                  )}
+                </p>
+              </div>
               <div className={styles.overlayFooter}>
                 <button
                   className={styles.editButton}

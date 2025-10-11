@@ -43,6 +43,21 @@
   padding: 1rem 2rem;
 }
 
+.overlayItems {
+  position: relative;
+  z-index: 1;
+}
+
+.overlayItems::before {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  background: rgba(0, 0, 0, 0.5);
+  filter: blur(15px);
+  z-index: -1;
+  border-radius: 20px;
+}
+
 .overlayFooter {
   position: absolute;
   left: 50%;
@@ -235,6 +250,51 @@
 
 .statsCards {
   display: none;
+}
+
+/* Copy functionality */
+.copyButton {
+  background: none;
+  border: none;
+  color: #a5d8ff;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.copyButton:hover {
+  color: #74c0fc;
+}
+
+.copiedMessage {
+  position: absolute;
+  margin-left: 8px;
+  font-size: 0.9rem;
+  color: #90ee90;
+  opacity: 0;
+  transform: translateY(0);
+  animation: fadeUp 1.8s ease-in-out forwards;
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 /* ===== 📱 Mobile layout ===== */

@@ -2,10 +2,11 @@ import type { AnswerOptionDto } from "./test";
 
 export interface TestAttemptMetadataDto {
   testId: string;
+  guestName?: string;
 }
 
 export interface AddTestAttemptDto {
-  testId: string;
+  testJoinId: string;
   userId?: string;
   guestName?: string;
   startedAt: Date;

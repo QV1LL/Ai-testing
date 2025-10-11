@@ -45,7 +45,13 @@ const PassTestAttemptPage: React.FC = () => {
       try {
         const data = await getAttemptById(id);
         setTestAttempt(data);
-        fetchTest();
+
+        if (data === null) {
+          console.log(data);
+          return;
+        }
+
+        await fetchTest(data.testId);
       } catch (error) {
         console.error(error);
       } finally {
@@ -53,11 +59,12 @@ const PassTestAttemptPage: React.FC = () => {
       }
     };
 
-    const fetchTest = async () => {
-      if (!id) return;
+    const fetchTest = async (testId: string) => {
       try {
-        const data = await getById(id);
+        const data = await getById(testId);
         setTest(data);
+
+        console.log(data);
         if (data.timeLimitMinutes) {
           setRemainingTime(data.timeLimitMinutes * 60);
         }
@@ -225,7 +232,7 @@ const PassTestAttemptPage: React.FC = () => {
 
                     {(q.type === QuestionType.SingleChoice ||
                       q.type === QuestionType.MultipleChoice) && (
-                      <ul>
+                      <ul className={styles.optionsList}>
                         {q.options.map((opt) => (
                           <li key={opt.id} className={styles.optionItem}>
                             <label className={styles.optionLabel}>

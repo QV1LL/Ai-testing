@@ -2,7 +2,7 @@
 
 public record AddTestAttemptDto
 (
-    Guid TestId,
+    string TestJoinId,
     Guid? UserId,
     string? GuestName,
     DateTimeOffset StartedAt

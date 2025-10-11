@@ -33,9 +33,6 @@ public class Test
         get => field;
         set
         {
-            if (value == null)
-                return;
-
             if (value <= 0)
                 throw new ArgumentException("Time limit must be greater than 0 minutes");
 

@@ -28,7 +28,7 @@ public class TestAttemptsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(AddTestAttemptDto dto)
+    public async Task<IActionResult> Create([FromBody] AddTestAttemptDto dto)
     {
         var result = await _testAttemptManageService.AddTestAttempt(dto);
 
