@@ -77,7 +77,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
                 <tr key={test.id}>
                   <td>{test.title}</td>
                   <td>{formatLocalDateTime(test.startedAt)}</td>
-                  <td>{test.score ?? "-"}</td>
+                  <td>{test.score.toFixed(2) ?? "-"}</td>
                 </tr>
               ))}
             </tbody>

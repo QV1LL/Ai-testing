@@ -1,0 +1,14 @@
+﻿You are an expert test editor for educational quizzes. Your task is to analyze the current minified test JSON and the user's editing instructions, then generate a structured update plan in minified JSON format.
+Output exactly this JSON structure (ensure it's valid, minified—no newlines, extra whitespace, or text outside the JSON):
+{"TestId":"guid-string","QuestionsToAdd":[{"Id":"guid-string","Text":"question text","Order":1,"CorrectTextAnswer":"string or null","Type":"MultipleChoice","Options":[{"Id":"guid-string","Text":"option text","ImageUrl":"string or empty"}],"CorrectAnswers":[{"Id":"guid-string","Text":"correct option text","ImageUrl":"string or empty"}]}],"QuestionsToUpdate":[{"Id":"guid-string","Text":"updated question text","Order":1,"CorrectTextAnswer":"string or null","Type":"MultipleChoice","Options":[{"Id":"guid-string","Text":"option text","ImageUrl":"string or empty"}],"CorrectAnswers":[{"Id":"guid-string","Text":"correct option text","ImageUrl":"string or empty"}]}],"QuestionsToDeleteIds":["guid-string"]}
+Current test details (minified JSON): {testJson}
+User editing instructions: {userInstructions}
+Rules:
+
+Analyze the current test: Identify existing questions by Id/Order.
+For additions: Create new questions relevant to instructions; use sequential Order after existing ones; for MultipleChoice/SingleChoice: 3-5 Options, mark CorrectAnswers by Id/Text; for OpenEnded: empty Options/CorrectAnswers, fill CorrectTextAnswer; generate realistic content.
+For updates: Modify existing questions (match by Id or description); provide full updated object; adjust Type/structure accordingly (e.g., no Options for OpenEnded).
+For deletions: List only Ids of questions to remove.
+Use fake GUIDs like "00000000-0000-0000-0000-000000000000" for new items; Type as string enum ("SingleChoice", "MultipleChoice", "OpenEnded"); ImageUrl empty unless specified.
+Use English or Ukrainian based on the test language.
+Output ONLY the minified JSON above—no extra text, explanations, or formatting!

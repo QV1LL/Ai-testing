@@ -11,6 +11,7 @@ public interface ITestManageService
     Task<Result<TestPreviewDto>> GetPreview(string joinId);
     Task<Result<CreateTestResultDto>> Create(CreateTestDto dto, IFormFile? coverImage, Guid ownerId);
     Task<Result> UpdateMetadata(UpdateTestMetadataDto dto, Guid ownerId);
+    Task<Result<UpdateQuestionDto>> PromptQuestions(PromptQuestionsDto dto, Guid ownerId);
     Task<Result<UpdateQuestionsResultDto>> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId);
     Task<Result> UpdateQuestionImage(UpdateQuestionImageDto dto, Guid ownerId);
     Task<Result> UpdateOptionImage(UpdateOptionImageDto dto, Guid ownerId);

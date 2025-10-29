@@ -4,6 +4,7 @@ using AiTesting.Domain.Enums;
 using AiTesting.Domain.Models;
 using AiTesting.Domain.Services.Test;
 using AiTesting.Domain.Services.User;
+using AiTesting.Infrastructure.Services.Llm;
 using AiTesting.Infrastructure.Services.Storage;
 using Microsoft.AspNetCore.Http;
 
@@ -15,6 +16,7 @@ internal class TestManageService : ITestManageService
     private readonly IUserService _userService;
     
     private readonly IFileStorageService _fileStorageService;
+    private readonly ILlmService _llmService;
     private readonly Infrastructure.Services.Http.IHttpContextAccessor _httpContextAccessor;
 
     private const string COVER_IMAGES_SUBFOLDER = "tests/coverImages";
@@ -24,12 +26,14 @@ internal class TestManageService : ITestManageService
     public TestManageService(IUserService userService,
                              ITestService testService,
                              IFileStorageService fileStorageService,
+                             ILlmService llmService,
                              Infrastructure.Services.Http.IHttpContextAccessor httpContextAccessor)
     {
         _userService = userService;
         _testService = testService;
         _fileStorageService = fileStorageService;
         _httpContextAccessor = httpContextAccessor;
+        _llmService = llmService;
     }
 
     public async Task<Result<UserTestsResultDto>> GetUserTests(Guid ownerId)
@@ -195,6 +199,21 @@ internal class TestManageService : ITestManageService
         {
             return Result.Failure(ex.Message);
         }
+    }
+    
+    public async Task<Result<UpdateQuestionDto>> PromptQuestions(PromptQuestionsDto dto, Guid ownerId)
+    {
+        var testResult = await _testService.GetByIdAsync(dto.TestId);
+
+        if (testResult.IsFailure)
+            return Result<UpdateQuestionDto>.Failure(testResult.Error);
+
+        var test = testResult.Value;
+
+        if (test.CreatedById != ownerId)
+            return Result<UpdateQuestionDto>.Failure("Cannot prompt questions for test which is not related to this user");
+
+        return await _llmService.GenerateUpdateQuestionsDto<UpdateQuestionDto>(test, dto.Prompt);
     }
 
     public async Task<Result<UpdateQuestionsResultDto>> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId)

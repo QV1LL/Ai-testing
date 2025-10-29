@@ -164,7 +164,7 @@ const ViewTestPage: React.FC = () => {
                       {test.testAttempts.length > 0
                         ? `${Math.max(
                             ...test.testAttempts.map((a) => a.score)
-                          )}%`
+                          ).toFixed(2)}%`
                         : "—"}
                     </p>
                   </div>
@@ -175,7 +175,7 @@ const ViewTestPage: React.FC = () => {
                       {test.testAttempts.length > 0
                         ? `${Math.min(
                             ...test.testAttempts.map((a) => a.score)
-                          )}%`
+                          ).toFixed(2)}%`
                         : "—"}
                     </p>
                   </div>
@@ -201,7 +201,7 @@ const ViewTestPage: React.FC = () => {
                           <tr key={attempt.id}>
                             <td>{index + 1}</td>
                             <td>{attempt.userDisplayName}</td>
-                            <td>{attempt.score}%</td>
+                            <td>{attempt.score.toFixed(2)}%</td>
                             <td>
                               {new Date(attempt.startedAt).toLocaleString()}
                             </td>
@@ -238,7 +238,9 @@ const ViewTestPage: React.FC = () => {
                         </p>
 
                         <p className={styles.label}>Score</p>
-                        <p className={styles.value}>{attempt.score}%</p>
+                        <p className={styles.value}>
+                          {attempt.score.toFixed(2)}%
+                        </p>
 
                         <p className={styles.label}>Started</p>
                         <p className={styles.value}>

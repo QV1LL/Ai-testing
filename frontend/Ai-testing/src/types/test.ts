@@ -138,3 +138,8 @@ export interface TestForAttemptDto {
   id: string;
   questions: QuestionDto[];
 }
+
+export interface PromptQuestionsDto {
+  prompt: string;
+  testId: string;
+}

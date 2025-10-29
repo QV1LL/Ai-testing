@@ -4,6 +4,7 @@ using AiTesting.Infrastructure.Persistence.Repositories;
 using AiTesting.Infrastructure.Persistence.Repositories.Concreate;
 using AiTesting.Infrastructure.Persistence.Repositories.Contracts;
 using AiTesting.Infrastructure.Services.Http;
+using AiTesting.Infrastructure.Services.Llm;
 using AiTesting.Infrastructure.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,7 @@ public static class DependencyInjection
 
         services.AddTransient<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped<ILlmService, CustomLlmService>();
 
         return services;
     }

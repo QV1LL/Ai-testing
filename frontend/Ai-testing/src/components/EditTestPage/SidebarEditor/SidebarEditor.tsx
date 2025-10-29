@@ -15,6 +15,7 @@ interface Props {
   selectedOption: UpdateOptionDto | null;
   setSelectedQuestion: (q: EditableQuestionDto | null) => void;
   setSelectedOption: (o: UpdateOptionDto | null) => void;
+  onUserSendPrompt: (prompt: string) => void;
 }
 
 const SidebarEditor: React.FC<Props> = ({
@@ -24,9 +25,12 @@ const SidebarEditor: React.FC<Props> = ({
   selectedOption,
   setSelectedQuestion,
   setSelectedOption,
+  onUserSendPrompt,
 }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isOpen, setIsOpen] = useState(false);
+
+  const [promptText, setPromptText] = useState<string>("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -309,6 +313,24 @@ const SidebarEditor: React.FC<Props> = ({
       ) : (
         <p>Select a question to edit</p>
       )}
+      <div className={styles.promptForm}>
+        <label>
+          Prompt:
+          <input
+            type="text"
+            value={promptText}
+            onChange={(e) => setPromptText(e.target.value)}
+          />
+        </label>
+        <button
+          onClick={() => {
+            onUserSendPrompt(promptText ?? "");
+            setPromptText("");
+          }}
+        >
+          Send prompt
+        </button>
+      </div>
     </div>
   );
 

@@ -49,6 +49,24 @@ public class TestsController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("prompt")]
+    public async Task<IActionResult> PromptQuestions([FromQuery] PromptQuestionsDto dto)
+    {
+        var ownerIdResult = GetUserId();
+        if (ownerIdResult.IsFailure)
+            return Unauthorized(new { message = ownerIdResult.Error });
+
+        if (string.IsNullOrWhiteSpace(dto.Prompt) || string.IsNullOrWhiteSpace(dto.TestId.ToString()))
+            return BadRequest(new { message = "Prompt and TestId are required." });
+
+        var result = await _testManageService.PromptQuestions(dto, ownerIdResult.Value);
+
+        return result.IsSuccess ?
+               Ok(result.Value) :
+               BadRequest(new { message = result.Error });
+    }
+
+    [Authorize]
     [HttpPut("questions")]
     public async Task<IActionResult> UpdateQuestions([FromBody] UpdateQuestionsDto dto)
     {

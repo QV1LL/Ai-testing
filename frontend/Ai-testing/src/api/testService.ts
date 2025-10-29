@@ -1,6 +1,7 @@
 import type {
   CreateTestDto,
   FullTestDto,
+  PromptQuestionsDto,
   TestMetadataDto,
   TestPreviewDto,
   UpdateOptionDto,
@@ -72,6 +73,15 @@ export const updateTestData = async (
   await api.put(`/tests/metadata`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+};
+
+export const getUpdateQuestionDtoFromPrompt = async (
+  dto: PromptQuestionsDto
+): Promise<UpdateQuestionsDto> => {
+  const res = await api.get<UpdateQuestionsDto>(`/tests/prompt`, {
+    params: dto,
+  });
+  return res.data;
 };
 
 export const updateTestQuestions = async (

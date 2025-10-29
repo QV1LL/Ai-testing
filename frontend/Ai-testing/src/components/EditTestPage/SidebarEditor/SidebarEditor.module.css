@@ -87,6 +87,32 @@
   flex-direction: column;
 }
 
+.promptForm {
+  margin-top: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.promptForm button {
+  padding: 0.5rem 1rem;
+  width: fit-content;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.925);
+  background-color: rgba(59, 130, 246, 0.719);
+  color: rgba(255, 251, 251, 0.747);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
+}
+
+.promptForm button:hover {
+  background-color: rgba(59, 130, 246, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.promptForm input,
 .editorForm input,
 .editorForm select {
   width: 100%;

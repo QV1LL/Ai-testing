@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getById,
+  getUpdateQuestionDtoFromPrompt,
   updateQuestionsAndOptionsImages,
   updateTestData,
   updateTestQuestions,
@@ -12,6 +13,7 @@ import {
   type UpdateTestMetadataDto,
   type UpdateQuestionsDto,
   type UpdateOptionDto,
+  type PromptQuestionsDto,
 } from "../../types/test";
 import { type EditableQuestionDto, QuestionState } from "../../types/test";
 
@@ -124,6 +126,17 @@ const EditTestPage: React.FC = () => {
     await updateQuestionsAndOptionsImages(dto);
   };
 
+  const onUserSendPrompt = async (prompt: string): Promise<void> => {
+    const dto: PromptQuestionsDto = {
+      prompt: prompt,
+      testId: test.id,
+    };
+
+    const data = await getUpdateQuestionDtoFromPrompt(dto);
+
+    console.log(data);
+  };
+
   const getSaveQuestionsDto = (
     questions: EditableQuestionDto[]
   ): UpdateQuestionsDto | null => {
@@ -191,6 +204,7 @@ const EditTestPage: React.FC = () => {
             selectedOption={selectedOption}
             setSelectedQuestion={setSelectedQuestion}
             setSelectedOption={setSelectedOption}
+            onUserSendPrompt={onUserSendPrompt}
           />
         </div>
       </div>
