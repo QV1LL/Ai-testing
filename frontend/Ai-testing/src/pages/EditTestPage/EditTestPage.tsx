@@ -22,11 +22,13 @@ import Footer from "../../components/Footer/Footer";
 import TestHeader from "../../components/EditTestPage/TestHeader/TestHeader";
 import QuestionsList from "../../components/EditTestPage/QuestionsList/QuestionsList";
 import SidebarEditor from "../../components/EditTestPage/SidebarEditor/SidebarEditor";
+import LoaderModal from "../../components/EditTestPage/LoaderModal/LoaderModal";
 
 const EditTestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const [isPromptLoading, setIsPromptLoading] = useState<boolean>(false);
   const [test, setTest] = useState<FullTestDto | null>(null);
   const [questions, setQuestions] = useState<EditableQuestionDto[]>([]);
   const [selectedQuestion, setSelectedQuestion] =
@@ -132,9 +134,69 @@ const EditTestPage: React.FC = () => {
       testId: test.id,
     };
 
-    const data = await getUpdateQuestionDtoFromPrompt(dto);
+    try {
+      setIsPromptLoading(true);
 
-    console.log(data);
+      const data: UpdateQuestionsDto = await getUpdateQuestionDtoFromPrompt(
+        dto
+      );
+
+      let updatedQuestions = [...questions];
+
+      data.questionsToDeleteIds.forEach((deleteId) => {
+        const questionIndex = updatedQuestions.findIndex(
+          (q) => q.id === deleteId
+        );
+        if (questionIndex !== -1) {
+          updatedQuestions[questionIndex] = {
+            ...updatedQuestions[questionIndex],
+            state: QuestionState.Deleted,
+          };
+        }
+      });
+
+      data.questionsToUpdate.forEach((updateQuestion) => {
+        const questionIndex = updatedQuestions.findIndex(
+          (q) => q.id === updateQuestion.id
+        );
+        if (questionIndex !== -1) {
+          updatedQuestions[questionIndex] = {
+            ...updatedQuestions[questionIndex],
+            ...updateQuestion,
+            state: QuestionState.Changed,
+            options: updateQuestion.options.map((o) => ({
+              id: o.id,
+              text: o.text,
+              imageFile: null,
+              imageUrl: o.imageUrl ?? null,
+            })),
+          };
+        }
+      });
+
+      const newQuestions = data.questionsToAdd.map((updateQuestion) => ({
+        ...updateQuestion,
+        state: QuestionState.Added,
+        options: updateQuestion.options.map((o) => ({
+          id: o.id,
+          text: o.text,
+          imageFile: null,
+          imageUrl: o.imageUrl ?? null,
+        })),
+      }));
+
+      updatedQuestions = [...updatedQuestions, ...newQuestions];
+
+      updatedQuestions.sort((a, b) => a.order - b.order);
+
+      setQuestions(updatedQuestions);
+      setIsPromptLoading(false);
+
+      console.log("Questions updated");
+    } catch (error) {
+      console.error("Error updating questions from prompt:", error);
+      setIsPromptLoading(false);
+    }
   };
 
   const getSaveQuestionsDto = (
@@ -171,6 +233,10 @@ const EditTestPage: React.FC = () => {
   return (
     <div className={styles.editTestPage}>
       <Header />
+      <LoaderModal
+        isLoading={isPromptLoading}
+        message="Генеруємо запитання..."
+      />
 
       <div className={styles.wrapper}>
         <div className={styles.container}>

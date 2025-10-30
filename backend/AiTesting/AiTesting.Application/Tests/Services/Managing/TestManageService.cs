@@ -201,19 +201,19 @@ internal class TestManageService : ITestManageService
         }
     }
     
-    public async Task<Result<UpdateQuestionDto>> PromptQuestions(PromptQuestionsDto dto, Guid ownerId)
+    public async Task<Result<UpdateQuestionsDto>> PromptQuestions(PromptQuestionsDto dto, Guid ownerId)
     {
         var testResult = await _testService.GetByIdAsync(dto.TestId);
 
         if (testResult.IsFailure)
-            return Result<UpdateQuestionDto>.Failure(testResult.Error);
+            return Result<UpdateQuestionsDto>.Failure(testResult.Error);
 
         var test = testResult.Value;
 
         if (test.CreatedById != ownerId)
-            return Result<UpdateQuestionDto>.Failure("Cannot prompt questions for test which is not related to this user");
+            return Result<UpdateQuestionsDto>.Failure("Cannot prompt questions for test which is not related to this user");
 
-        return await _llmService.GenerateUpdateQuestionsDto<UpdateQuestionDto>(test, dto.Prompt);
+        return await _llmService.GenerateUpdateQuestionsDto<UpdateQuestionsDto>(test, dto.Prompt);
     }
 
     public async Task<Result<UpdateQuestionsResultDto>> UpdateQuestions(UpdateQuestionsDto dto, Guid ownerId)

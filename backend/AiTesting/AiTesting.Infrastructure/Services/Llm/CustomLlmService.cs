@@ -19,12 +19,17 @@ public class CustomLlmService : ILlmService
     private const string GENERATE_QUESTIONS_TEMPLATE_PATH = "generate_questions_prompt.txt";
     private const string CHECK_ANSWERS_TEMPLATE_PATH = "check_answer_prompt.txt";
 
+    private const int TIMEOUT = 1000;
+
     public CustomLlmService(IConfiguration configuration)
     {
         _modelName = configuration["Llm:ModelName"] ?? string.Empty;
         var endPointString = configuration["Llm:EndPoint"] ?? string.Empty;
         _llmEndPoint = new Uri(endPointString);
-        _httpClient = new HttpClient();
+        _httpClient = new()
+        {
+            Timeout = TimeSpan.FromSeconds(TIMEOUT)
+        };
     }
 
     private void LoadGenerateTemplateIfNeeded()
@@ -74,7 +79,7 @@ public class CustomLlmService : ILlmService
             {
                 model = _modelName,
                 messages = new[] { new { role = "user", content = fullPrompt } },
-                max_tokens = 1500,
+                max_tokens = 15000,
                 temperature = 0.2
             };
 
@@ -96,7 +101,7 @@ public class CustomLlmService : ILlmService
             if (string.IsNullOrWhiteSpace(jsonOutput))
                 return Result<T>.Failure("Empty response from LLM.");
 
-            jsonOutput = ExtractJsonFromResponse(jsonOutput);
+            jsonOutput = NormalizeJsonString(jsonOutput);
 
             try
             {
@@ -180,7 +185,7 @@ public class CustomLlmService : ILlmService
         if (string.IsNullOrWhiteSpace(jsonOutput))
             throw new InvalidOperationException("Empty response from LLM.");
 
-        jsonOutput = ExtractJsonFromResponse(jsonOutput);
+        jsonOutput = NormalizeJsonString(jsonOutput);
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var result = JsonSerializer.Deserialize<JsonElement>(jsonOutput, options);
@@ -193,19 +198,6 @@ public class CustomLlmService : ILlmService
         var confidence = confidenceProp.GetDouble();
 
         return isCorrect && confidence >= 0.8;
-    }
-
-    private static string ExtractJsonFromResponse(string response)
-    {
-        if (response.StartsWith('{') && response.EndsWith('}'))
-            return response;
-
-        var start = response.IndexOf('{');
-        var end = response.LastIndexOf('}');
-        if (start >= 0 && end > start)
-            return response.Substring(start, end - start + 1);
-
-        return response;
     }
 
     private async Task<string> FixJsonAsync(string invalidJson)
@@ -222,7 +214,7 @@ public class CustomLlmService : ILlmService
         {
             model = _modelName,
             messages = new[] { new { role = "user", content = repairPrompt } },
-            max_tokens = 800,
+            max_tokens = 8000,
             temperature = 0.0
         };
 
@@ -244,6 +236,41 @@ public class CustomLlmService : ILlmService
         if (string.IsNullOrWhiteSpace(fixedJson))
             throw new InvalidOperationException("LLM returned empty JSON fix response.");
 
-        return ExtractJsonFromResponse(fixedJson);
+        return NormalizeJsonString(fixedJson);
     }
+
+    private static string NormalizeJsonString(string? jsonString)
+    {
+        if (string.IsNullOrWhiteSpace(jsonString))
+            throw new InvalidOperationException("Empty or null JSON string received from LLM.");
+
+        var start = jsonString.IndexOf('{');
+        var end = jsonString.LastIndexOf('}');
+        if (start >= 0 && end > start)
+            jsonString = jsonString.Substring(start, end - start + 1);
+
+        if (jsonString.Contains("\\\""))
+        {
+            try
+            {
+                jsonString = JsonSerializer.Deserialize<string>($"\"{jsonString.Replace("\"", "\\\"")}\"") ?? jsonString;
+            }
+            catch
+            {
+                jsonString = jsonString.Replace("\\\"", "\"");
+            }
+        }
+
+        jsonString = jsonString
+            .Replace("\r", "")
+            .Replace("\n", "")
+            .Replace("\t", "")
+            .Trim();
+
+        if (!(jsonString.StartsWith('{') && jsonString.EndsWith('}')))
+            throw new InvalidOperationException("Response content does not contain valid JSON structure.");
+
+        return jsonString;
+    }
+
 }
