@@ -40,6 +40,21 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(q => q.CorrectAnswers)
-            .WithMany();
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "QuestionCorrectAnswers",
+                j => j.HasOne<AnswerOption>()
+                      .WithMany()
+                      .HasForeignKey("AnswerOptionId")
+                      .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Question>()
+                      .WithMany()
+                      .HasForeignKey("QuestionId")
+                      .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.ToTable("QuestionCorrectAnswers");
+                    j.HasKey("QuestionId", "AnswerOptionId");
+                });
     }
 }

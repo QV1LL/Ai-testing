@@ -70,6 +70,7 @@ internal class TestManageService : ITestManageService
             Questions: test.Questions.Select(q => new QuestionDto(
                     Id: q.Id,
                     Text: q.Text,
+                    CorrectTextAnswer: q.CorrectTextAnswer,
                     ImageUrl: string.IsNullOrEmpty(q.ImageUrl) ? q.ImageUrl : $"{_httpContextAccessor.GetApiUrl()}{q.ImageUrl}",
                     Order: q.Order,
                     Type: q.Type,

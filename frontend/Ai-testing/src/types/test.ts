@@ -77,9 +77,9 @@ export interface UserTestsResultDto {
 }
 
 export enum QuestionType {
-  SingleChoice,
-  MultipleChoice,
-  OpenEnded,
+  SingleChoice = 1,
+  MultipleChoice = 2,
+  OpenEnded = 3,
 }
 
 export interface AnswerOptionDto {

@@ -33,6 +33,43 @@
   margin: 0 auto 1rem;
 }
 
+.loaderModalError {
+  border: 2px solid #e74c3c;
+  background-color: #2b000077;
+  color: #ffcccc;
+}
+
+.errorIcon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.loaderModal p {
+  margin: 0;
+  color: #333;
+}
+
+.loaderModal p.errorMessage {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #f3f3f3;
+  text-align: center;
+}
+
+.closeButton {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #c0392b;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -40,9 +77,4 @@
   100% {
     transform: rotate(360deg);
   }
-}
-
-.loaderModal p {
-  margin: 0;
-  color: #333;
 }

@@ -1,43 +1,31 @@
 ﻿using AiTesting.Domain.Common;
 using AiTesting.Domain.Models;
 using AiTesting.Infrastructure.Services.Llm.Helpers;
+using Google;
+using Google.GenAI;
+using Google.GenAI.Types;
 using Microsoft.Extensions.Configuration;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace AiTesting.Infrastructure.Services.Llm;
 
-public class CustomLlmService : ILlmService
+public class GeminiLlmService : ILlmService
 {
-    private readonly HttpClient _httpClient;
+    private readonly Client _client;
     private readonly string _modelName;
-    private readonly Uri _llmEndPoint;
 
-    private readonly string _generateQuestionsTemplate;
-    private readonly string _checkAnswerTemplate;
-
-    private const int TIMEOUT = 1000;
-
-    public CustomLlmService(IConfiguration configuration)
+    public GeminiLlmService(IConfiguration configuration)
     {
-        _modelName = configuration["Llm:Custom:ModelName"] ?? string.Empty;
-        var endPointString = configuration["Llm:Custom:EndPoint"] ?? string.Empty;
-        _llmEndPoint = new Uri(endPointString);
-        _httpClient = new()
-        {
-            Timeout = TimeSpan.FromSeconds(TIMEOUT)
-        };
-
-        _generateQuestionsTemplate = TemplateLoaderHelper.LoadGenerateTemplate();
-        _checkAnswerTemplate = TemplateLoaderHelper.LoadCheckAnswerTemplate();
+        var apiKey = System.Environment.GetEnvironmentVariable("GOOGLE_AI_API") ?? throw new InvalidOperationException("GOOGLE_AI_API environment variable is required.");
+        _modelName = configuration["Llm:Gemini:ModelName"] ?? throw new InvalidOperationException("Gemini:ModelName configuration is required.");
+        _client = new Client(apiKey: apiKey);
     }
 
     public async Task<Result<T>> GenerateUpdateQuestionsDto<T>(Test test, string prompt)
     {
         ArgumentNullException.ThrowIfNull(test);
         if (string.IsNullOrWhiteSpace(prompt)) return Result<T>.Failure("Prompt cannot be null or empty.");
-        if (string.IsNullOrWhiteSpace(_modelName)) return Result<T>.Failure("Model name is required.");
 
         try
         {
@@ -48,32 +36,36 @@ public class CustomLlmService : ILlmService
             };
 
             var testJson = JsonSerializer.Serialize(test, serializeOptions);
-            var fullPrompt = _generateQuestionsTemplate
+            var fullPrompt = TemplateLoaderHelper.LoadGenerateTemplate()
                 .Replace("{testJson}", testJson)
                 .Replace("{userInstructions}", prompt);
 
-            var requestBody = new
+            var contents = new List<Content>
             {
-                model = _modelName,
-                messages = new[] { new { role = "user", content = fullPrompt } },
-                max_tokens = 15000,
-                temperature = 0.2
+                new Content
+                {
+                    Role = "user",
+                    Parts = [ new Part { Text = fullPrompt } ]
+                }
             };
 
-            var jsonRequest = JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            var config = new GenerateContentConfig
+            {
+                MaxOutputTokens = 15000,
+                Temperature = 0.2f,
+                ResponseMimeType = "application/json"
+            };
 
-            var response = await _httpClient.PostAsync(new Uri(_llmEndPoint, "/v1/chat/completions"), content);
-            response.EnsureSuccessStatusCode();
+            var response = await _client.Models.GenerateContentAsync(_modelName, contents, config);
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(responseJson);
+            if (response.Candidates == null || response.Candidates.Count == 0)
+                return Result<T>.Failure("Invalid response from LLM: no candidates.");
 
-            if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
-                return Result<T>.Failure("Invalid response from LLM: no choices.");
+            var candidate = response.Candidates[0];
+            if (candidate.Content == null || candidate.Content.Parts == null || candidate.Content.Parts.Count == 0)
+                return Result<T>.Failure("Invalid response from LLM: no content parts.");
 
-            var message = choices[0].GetProperty("message");
-            var jsonOutput = message.GetProperty("content").GetString()?.Trim();
+            var jsonOutput = candidate.Content.Parts[0].Text?.Trim();
 
             if (string.IsNullOrWhiteSpace(jsonOutput))
                 return Result<T>.Failure("Empty response from LLM.");
@@ -108,9 +100,9 @@ public class CustomLlmService : ILlmService
                 }
             }
         }
-        catch (HttpRequestException httpEx)
+        catch (GoogleApiException apiEx)
         {
-            return Result<T>.Failure($"HTTP request failed: {httpEx.Message}");
+            return Result<T>.Failure($"Gemini API request failed: {apiEx.Message}");
         }
         catch (JsonException jsonEx)
         {
@@ -127,36 +119,38 @@ public class CustomLlmService : ILlmService
         if (string.IsNullOrWhiteSpace(userAnswer)) throw new ArgumentNullException(nameof(userAnswer));
         if (string.IsNullOrWhiteSpace(correctAnswer)) throw new ArgumentNullException(nameof(correctAnswer));
         if (string.IsNullOrWhiteSpace(questionText)) throw new ArgumentNullException(nameof(questionText));
-        if (string.IsNullOrWhiteSpace(_modelName)) throw new ArgumentException("Model name is required.", nameof(_modelName));
 
-
-        var fullPrompt = _checkAnswerTemplate
+        var fullPrompt = TemplateLoaderHelper.LoadCheckAnswerTemplate()
             .Replace("{questionText}", questionText)
             .Replace("{correctAnswer}", correctAnswer)
             .Replace("{userAnswer}", userAnswer);
 
-        var requestBody = new
+        var contents = new List<Content>
         {
-            model = _modelName,
-            messages = new[] { new { role = "user", content = fullPrompt } },
-            max_tokens = 200,
-            temperature = 0.1
+            new Content
+            {
+                Role = "user",
+                Parts = [ new Part { Text = fullPrompt } ]
+            }
         };
 
-        var jsonRequest = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+        var config = new GenerateContentConfig
+        {
+            MaxOutputTokens = 200,
+            Temperature = 0.1f,
+            ResponseMimeType = "application/json"
+        };
 
-        var response = await _httpClient.PostAsync(new Uri(_llmEndPoint, "/v1/chat/completions"), content);
-        response.EnsureSuccessStatusCode();
+        var response = await _client.Models.GenerateContentAsync(_modelName, contents, config);
 
-        var responseJson = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(responseJson);
+        if (response.Candidates == null || response.Candidates.Count == 0)
+            throw new InvalidOperationException("Invalid response from LLM: no candidates.");
 
-        if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
-            throw new InvalidOperationException("Invalid response from LLM: no choices.");
+        var candidate = response.Candidates[0];
+        if (candidate.Content == null || candidate.Content.Parts == null || candidate.Content.Parts.Count == 0)
+            throw new InvalidOperationException("Invalid response from LLM: no content parts.");
 
-        var message = choices[0].GetProperty("message");
-        var jsonOutput = message.GetProperty("content").GetString()?.Trim();
+        var jsonOutput = candidate.Content.Parts[0].Text?.Trim();
 
         if (string.IsNullOrWhiteSpace(jsonOutput))
             throw new InvalidOperationException("Empty response from LLM.");
@@ -186,28 +180,32 @@ public class CustomLlmService : ILlmService
             JSON:
             {invalidJson}";
 
-        var requestBody = new
+        var contents = new List<Content>
         {
-            model = _modelName,
-            messages = new[] { new { role = "user", content = repairPrompt } },
-            max_tokens = 8000,
-            temperature = 0.0
+            new Content
+            {
+                Role = "user",
+                Parts = [ new Part { Text = repairPrompt } ]
+            }
         };
 
-        var jsonRequest = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+        var config = new GenerateContentConfig
+        {
+            MaxOutputTokens = 8000,
+            Temperature = 0.0f,
+            ResponseMimeType = "application/json"
+        };
 
-        var response = await _httpClient.PostAsync(new Uri(_llmEndPoint, "/v1/chat/completions"), content);
-        response.EnsureSuccessStatusCode();
+        var response = await _client.Models.GenerateContentAsync(_modelName, contents, config);
 
-        var responseJson = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(responseJson);
-
-        if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+        if (response.Candidates == null || response.Candidates.Count == 0)
             throw new InvalidOperationException("Invalid response from LLM while fixing JSON.");
 
-        var message = choices[0].GetProperty("message");
-        var fixedJson = message.GetProperty("content").GetString()?.Trim();
+        var candidate = response.Candidates[0];
+        if (candidate.Content == null || candidate.Content.Parts == null || candidate.Content.Parts.Count == 0)
+            throw new InvalidOperationException("Invalid response from LLM while fixing JSON: no content parts.");
+
+        var fixedJson = candidate.Content.Parts[0].Text?.Trim();
 
         if (string.IsNullOrWhiteSpace(fixedJson))
             throw new InvalidOperationException("LLM returned empty JSON fix response.");

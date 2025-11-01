@@ -13,6 +13,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
   passedTests = [],
 }) => {
   const navigate = useNavigate();
+  const maxTitleSize: number = 25;
 
   const formatLocalDateTime = (dateInput: string | Date) => {
     const date =
@@ -22,6 +23,12 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
     ).padStart(2, "0")}.${date.getFullYear()} ${String(
       date.getHours()
     ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  };
+
+  const truncateString = (str: string, maxLength: number): string => {
+    if (str.length <= maxLength) return str;
+    if (maxLength <= 3) return str.slice(0, maxLength);
+    return str.slice(0, maxLength - 3) + "...";
   };
 
   return (
@@ -41,7 +48,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
             <tbody>
               {createdTests.map((test) => (
                 <tr key={test.id}>
-                  <td>{test.title}</td>
+                  <td>{truncateString(test.title, maxTitleSize)}</td>
                   <td>{formatLocalDateTime(test.createdAt)}</td>
                   <td>
                     <button
@@ -75,7 +82,7 @@ const InteractedTestsSection: React.FC<InteractedTestsSectionProps> = ({
             <tbody>
               {passedTests.map((test) => (
                 <tr key={test.id}>
-                  <td>{test.title}</td>
+                  <td>{truncateString(test.title, maxTitleSize)}</td>
                   <td>{formatLocalDateTime(test.startedAt)}</td>
                   <td>{test.score.toFixed(2) ?? "-"}</td>
                 </tr>

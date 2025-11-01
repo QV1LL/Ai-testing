@@ -25,7 +25,7 @@ public class AttemptAnswerConfiguration : IEntityTypeConfiguration<AttemptAnswer
             .WithMany()
             .HasForeignKey(a => a.QuestionId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasMany(a => a.SelectedOptions)

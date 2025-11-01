@@ -25,7 +25,7 @@ public static class DependencyInjection
 
         services.AddTransient<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddScoped<ILlmService, CustomLlmService>();
+        services.AddScoped<ILlmService, GeminiLlmService>();
 
         return services;
     }

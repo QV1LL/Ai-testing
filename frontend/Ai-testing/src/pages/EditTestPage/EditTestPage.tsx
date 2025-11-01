@@ -29,6 +29,8 @@ const EditTestPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [isPromptLoading, setIsPromptLoading] = useState<boolean>(false);
+  const [isPromptFailed, setIsPromptFailed] = useState<boolean>(false);
+
   const [test, setTest] = useState<FullTestDto | null>(null);
   const [questions, setQuestions] = useState<EditableQuestionDto[]>([]);
   const [selectedQuestion, setSelectedQuestion] =
@@ -135,6 +137,7 @@ const EditTestPage: React.FC = () => {
     };
 
     try {
+      setIsPromptFailed(false);
       setIsPromptLoading(true);
 
       const data: UpdateQuestionsDto = await getUpdateQuestionDtoFromPrompt(
@@ -196,6 +199,7 @@ const EditTestPage: React.FC = () => {
     } catch (error) {
       console.error("Error updating questions from prompt:", error);
       setIsPromptLoading(false);
+      setIsPromptFailed(true);
     }
   };
 
@@ -235,7 +239,9 @@ const EditTestPage: React.FC = () => {
       <Header />
       <LoaderModal
         isLoading={isPromptLoading}
-        message="Генеруємо запитання..."
+        isFailed={isPromptFailed}
+        message="Generating..."
+        errorMessage="Error while generating a test!"
       />
 
       <div className={styles.wrapper}>

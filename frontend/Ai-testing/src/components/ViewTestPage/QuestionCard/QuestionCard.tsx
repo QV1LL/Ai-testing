@@ -1,5 +1,5 @@
 import React from "react";
-import type { QuestionDto } from "../../../types/test";
+import { QuestionType, type QuestionDto } from "../../../types/test";
 import styles from "./QuestionCard.module.css";
 
 interface QuestionCardProps {
@@ -50,11 +50,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, index }) => {
         </ul>
       )}
 
-      {question.type === 2 && question.correctTextAnswer && (
-        <p className={styles.correctTextAnswer}>
-          Correct answer: {question.correctTextAnswer}
-        </p>
-      )}
+      {question.type === QuestionType.OpenEnded &&
+        question.correctTextAnswer && (
+          <p className={styles.correctTextAnswer}>
+            Correct answer:{" "}
+            <span className={styles.correct}>{question.correctTextAnswer}</span>
+          </p>
+        )}
     </div>
   );
 };

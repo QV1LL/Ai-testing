@@ -6,6 +6,7 @@ public record QuestionDto(
     Guid Id,
     string Text,
     string? ImageUrl,
+    string? CorrectTextAnswer,
     int Order,
     QuestionType Type,
     List<AnswerOptionDto> Options,

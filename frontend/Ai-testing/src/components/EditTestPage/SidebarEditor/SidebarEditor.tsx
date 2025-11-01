@@ -31,6 +31,8 @@ const SidebarEditor: React.FC<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const [promptText, setPromptText] = useState<string>("");
+  const [isPromptButtonDisabled, setIsPromptButtonDisabled] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -319,13 +321,20 @@ const SidebarEditor: React.FC<Props> = ({
           <input
             type="text"
             value={promptText}
-            onChange={(e) => setPromptText(e.target.value)}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setPromptText(newValue);
+              setIsPromptButtonDisabled(newValue.trim() === "");
+            }}
           />
         </label>
         <button
+          disabled={isPromptButtonDisabled}
           onClick={() => {
-            onUserSendPrompt(promptText ?? "");
-            setPromptText("");
+            if (promptText.trim() !== "") {
+              onUserSendPrompt(promptText);
+              setPromptText("");
+            }
           }}
         >
           Send prompt
