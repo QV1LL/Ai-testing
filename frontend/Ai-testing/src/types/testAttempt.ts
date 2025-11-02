@@ -1,4 +1,4 @@
-import type { AnswerOptionDto } from "./test";
+import type { AnswerOptionDto, QuestionDto } from "./test";
 
 export interface TestAttemptMetadataDto {
   testId: string;
@@ -32,5 +32,7 @@ export interface TestAttemptResultDto {
   displayUsername: string;
   startedAt: Date;
   finishedAt: Date;
+  questions: QuestionDto[];
+  answers: AttemptAnswerDto[];
   score: number;
 }

@@ -32,7 +32,7 @@ const SidebarEditor: React.FC<Props> = ({
 
   const [promptText, setPromptText] = useState<string>("");
   const [isPromptButtonDisabled, setIsPromptButtonDisabled] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   useEffect(() => {
     const handleResize = () => {

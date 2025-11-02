@@ -6,5 +6,6 @@ public interface ITestAttemptService
 {
     Task<Result<Models.TestAttempt>> GetByIdAsync(Guid id);
     Task<Result> AddAsync(Models.TestAttempt testAttempt);
+    Task<Result> UpdateAsync(Models.TestAttempt testAttempt);
     Task<Result> FinishAsync(Models.TestAttempt testAttempt);
 }

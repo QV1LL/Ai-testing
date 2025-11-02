@@ -1,4 +1,6 @@
-﻿namespace AiTesting.Application.TestAttempts.Dto.Managing;
+﻿using AiTesting.Application.Tests.Dto.Managing;
+
+namespace AiTesting.Application.TestAttempts.Dto.Managing;
 
 public record TestAttemptResultDto
 (
@@ -6,5 +8,7 @@ public record TestAttemptResultDto
     string DisplayUsername,
     DateTimeOffset StartedAt,
     DateTimeOffset FinishedAt,
+    List<QuestionDto> Questions,
+    List<AttemptAnswerDto> Answers,
     double Score
 );

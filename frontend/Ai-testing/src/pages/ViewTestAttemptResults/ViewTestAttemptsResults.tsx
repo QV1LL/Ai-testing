@@ -3,6 +3,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import styles from "./ViewTestAttemptsResults.module.css";
 import type { TestAttemptResultDto } from "../../types/testAttempt";
+import QuestionCard from "../../components/ViewTestPage/QuestionCard/QuestionCard";
 
 const ViewTestAttemptResults: React.FC = () => {
   const { state } = useLocation();
@@ -26,6 +27,7 @@ const ViewTestAttemptResults: React.FC = () => {
       <div className={styles.viewTestPage}>
         <div className={styles.wrapper}>
           <div className={styles.container}>
+            {/* Header */}
             <div
               className={styles.header}
               style={{
@@ -39,6 +41,7 @@ const ViewTestAttemptResults: React.FC = () => {
               </div>
             </div>
 
+            {/* Stats */}
             <div className={styles.content}>
               <div className={styles.stats}>
                 <div>
@@ -58,6 +61,24 @@ const ViewTestAttemptResults: React.FC = () => {
                 <div>
                   <h4>Duration</h4>
                   <p>{durationMinutes} min</p>
+                </div>
+              </div>
+
+              {/* Question results */}
+              <div className={styles.questionsSection}>
+                <h2>Answers Review</h2>
+                <div className={styles.questionsList}>
+                  {result.questions
+                    .sort((a, b) => a.order - b.order)
+                    .map((question, index) => (
+                      <QuestionCard
+                        key={question.id}
+                        question={question}
+                        index={index}
+                        mode="results"
+                        answers={result.answers}
+                      />
+                    ))}
                 </div>
               </div>
 

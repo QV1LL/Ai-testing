@@ -1,10 +1,12 @@
 ﻿using AiTesting.Application.TestAttempts.Dto.Managing;
+using AiTesting.Application.Tests.Dto.Managing;
 using AiTesting.Domain.Common;
 using AiTesting.Domain.Models;
 using AiTesting.Domain.Services.Guest;
 using AiTesting.Domain.Services.Test;
 using AiTesting.Domain.Services.TestAttempt;
 using AiTesting.Domain.Services.User;
+using System.Collections.Immutable;
 
 namespace AiTesting.Application.TestAttempts.Services.Managing;
 
@@ -139,9 +141,42 @@ internal class TestAttemptManageService : ITestAttemptManageService
                              testAttempt.User.DisplayName,
             StartedAt: testAttempt.StartedAt,
             FinishedAt: testAttempt.FinishedAt ?? new(),
+            Questions: test.Questions.Select(QuestionToQuestionDto).ToList(),
+            Answers: testAttempt.Answers.Select(AttemptAnswerToAttemptAnswerDto).ToList(),
             Score: testAttempt.Score
         );
 
+        testAttempt.Answers.Clear();
+        _ = _testAttemptService.UpdateAsync(testAttempt);
+
         return Result<TestAttemptResultDto>.Success(testAttemptResultDto);
+    }
+
+    private static QuestionDto QuestionToQuestionDto(Question question)
+    {
+        return new QuestionDto
+        (
+            Id: question.Id,
+            Text: question.Text,
+            ImageUrl: question.ImageUrl,
+            CorrectTextAnswer: question.CorrectTextAnswer,
+            Order: question.Order,
+            Type: question.Type,
+            Options: question.Options.Select(o => new AnswerOptionDto(o.Id, o.Text, o.ImageUrl))
+                                     .ToList(),
+            CorrectAnswers: question.CorrectAnswers.Select(o => new AnswerOptionDto(o.Id, o.Text, o.ImageUrl))
+                                                   .ToList()
+        );
+    }
+
+    private static AttemptAnswerDto AttemptAnswerToAttemptAnswerDto(AttemptAnswer attemptAnswer)
+    {
+        return new AttemptAnswerDto
+        (
+            QuestionId: attemptAnswer.QuestionId,
+            SelectedOptions: attemptAnswer.SelectedOptions.Select(o => new AnswerOptionDto(o.Id, o.Text, o.ImageUrl))
+                                                          .ToList(),
+            WrittenAnswer: attemptAnswer.WrittenAnswer
+        );
     }
 }

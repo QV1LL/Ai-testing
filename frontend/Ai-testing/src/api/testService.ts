@@ -106,6 +106,8 @@ export const updateTestQuestions = async (
     dtoWithoutFiles
   );
 
+  console.log(dtoWithoutFiles);
+
   return res.data;
 };
 

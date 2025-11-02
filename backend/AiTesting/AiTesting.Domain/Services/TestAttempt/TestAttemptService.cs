@@ -38,6 +38,14 @@ internal class TestAttemptService : ITestAttemptService
         return Result.Success();
     }
 
+    public async Task<Result> UpdateAsync(Models.TestAttempt testAttempt)
+    {
+        await _repository.UpdateAsync(testAttempt);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
     public async Task<Result> FinishAsync(Models.TestAttempt testAttempt)
     {
         var test = await _testRepository.GetByIdAsync(testAttempt.Test.Id, new TestWithQuestionsSpecification());
@@ -45,6 +53,7 @@ internal class TestAttemptService : ITestAttemptService
         if (test == null)
         {
             await _repository.DeleteAsync(testAttempt);
+            await _unitOfWork.SaveChangesAsync();
             return Result.Failure("Test wasn`t found, attempt failed");
         }
 
@@ -54,6 +63,7 @@ internal class TestAttemptService : ITestAttemptService
         if (attemptTime > maxAttemptTime)
         {
             await _repository.DeleteAsync(testAttempt);
+            await _unitOfWork.SaveChangesAsync();
             return Result.Failure("Test attempt is expired, attempt failed");
         }
 
@@ -71,41 +81,60 @@ internal class TestAttemptService : ITestAttemptService
         if (test == null || test.Questions == null || test.Questions.Count == 0)
             return 0;
 
-        int totalCorrectAnswers = 0;
-        int userCorrectAnswers = 0;
+        double totalScore = 0;
+        double userScore = 0;
 
         foreach (var question in test.Questions)
         {
             var userAnswer = testAttempt.Answers.FirstOrDefault(a => a.Question.Id == question.Id);
-            if (question.CorrectAnswers == null) continue;
+            if (question.CorrectAnswers == null && question.Type != Enums.QuestionType.OpenEnded)
+                continue;
 
-            var correctIds = question.CorrectAnswers.Select(o => o.Id).ToList();
-            totalCorrectAnswers += correctIds.Count;
+            totalScore += 1.0;
 
-            if (userAnswer == null) continue;
+            if (userAnswer == null)
+                continue;
 
-            if (question.Type == Enums.QuestionType.SingleChoice || question.Type == Enums.QuestionType.MultipleChoice)
+            switch (question.Type)
             {
-                if (userAnswer.SelectedOptions == null) continue;
-                userCorrectAnswers += userAnswer.SelectedOptions.Select(o => o.Id)
-                                                                .Count(correctIds.Contains);
-            }
-            else if (question.Type == Enums.QuestionType.OpenEnded)
-            {
-                if (!string.IsNullOrWhiteSpace(question.CorrectTextAnswer) &&
-                    string.Equals(userAnswer.WrittenAnswer?.Trim(), question.CorrectTextAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
-                {
-                    userCorrectAnswers++;
-                    totalCorrectAnswers++;
-                }
-                else
-                {
-                    totalCorrectAnswers++;
-                }
+                case Enums.QuestionType.SingleChoice:
+                    {
+                        var correctId = question.CorrectAnswers.FirstOrDefault()?.Id;
+                        var selectedId = userAnswer.SelectedOptions?.FirstOrDefault()?.Id;
+                        if (correctId != null && selectedId == correctId) userScore += 1.0;
+
+                        break;
+                    }
+
+                case Enums.QuestionType.MultipleChoice:
+                    {
+                        var correctIds = question.CorrectAnswers.Select(o => o.Id).ToHashSet();
+                        var selectedIds = userAnswer.SelectedOptions?.Select(o => o.Id).ToHashSet() ?? [];
+
+                        bool hasWrongSelection = selectedIds.Except(correctIds).Any();
+                        if (hasWrongSelection) break;
+
+                        int correctlySelected = selectedIds.Count(correctIds.Contains);
+                        int totalCorrect = correctIds.Count;
+
+                        double partialScore = (double)correctlySelected / totalCorrect;
+                        userScore += partialScore;
+                        break;
+                    }
+
+                case Enums.QuestionType.OpenEnded:
+                    {
+                        if (!string.IsNullOrWhiteSpace(question.CorrectTextAnswer) &&
+                            string.Equals(userAnswer.WrittenAnswer?.Trim(), question.CorrectTextAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
+                            userScore += 1.0;
+
+                        break;
+                    }
             }
         }
 
-        if (totalCorrectAnswers == 0) return 0;
-        return (double)userCorrectAnswers / totalCorrectAnswers * 100.0;
+        return totalScore <= 0 ? 
+               0 : 
+               userScore / totalScore * 100.0;
     }
 }

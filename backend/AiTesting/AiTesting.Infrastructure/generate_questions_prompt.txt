@@ -11,6 +11,6 @@ For additions: Add new questions to QuestionsToAdd by the template, fill the Tex
 For updates: Modify existing questions (modify all fields but match id with existing question id); provide full updated object; adjust Type/structure accordingly (e.g., no Options for OpenEnded).
 For deletions: List only Ids of questions to remove.
 Use this id for marking new items: "00000000-0000-0000-0000-XXXXXXXXXXXX", make all ids unique!; 
-Type as int enum (SingleChoice - 1, MultipleChoice - 2, OpenEnded - 3); 
+Type as int enum (SingleChoice - 0, MultipleChoice - 1, OpenEnded - 2); 
 Use English or Ukrainian based on the test language;
 Output ONLY the minified JSON above—no extra text, explanations, or formatting!
