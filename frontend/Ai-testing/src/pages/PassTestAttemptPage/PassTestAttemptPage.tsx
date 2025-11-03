@@ -276,7 +276,8 @@ const PassTestAttemptPage: React.FC = () => {
                     )}
 
                     {q.type === QuestionType.OpenEnded && (
-                      <textarea
+                      <input
+                        className={styles.writtenAnswerInput}
                         value={answers[q.id]?.writtenAnswer || ""}
                         onChange={(e) => handleText(q.id, e.target.value)}
                         placeholder="Write your answer..."
