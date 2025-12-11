@@ -1,0 +1,73 @@
+# Defines the three services (containers) of the application
+services:
+    # 1. PostgreSQL Database Service
+    db:
+        image: postgres:16-alpine
+        restart: always
+        environment:
+            # MANDATORY: Credentials and database name for the connection
+            POSTGRES_USER: ai_testing_user
+            POSTGRES_PASSWORD: StrongPassword123!
+            POSTGRES_DB: ai_testing_db
+        volumes:
+            # Persist the database data to avoid data loss on container stop/remove
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            # Optional: Expose the PostgreSQL port for local tooling (like PgAdmin)
+            - '5432:5432'
+        healthcheck:
+            # A health check is critical for 'depends_on' in the backend
+            test: ['CMD-SHELL', 'pg_isready -U ai_testing_user -d ai_testing_db']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - app-network
+
+    # 2. ASP.NET Backend API Service
+    backend:
+        # Build context is the root directory, Dockerfile is inside the project folder
+        build:
+            context: ./backend/AiTesting
+            dockerfile: ./AiTesting.Api/Dockerfile
+        environment:
+            # CRITICAL: Connection string using the 'db' service name as the Host.
+            # This resolves automatically within the Docker Compose network.
+            ConnectionStrings__ASPNETCORE_CONNECTION_STRING: 'Host=db;Port=5432;Database=ai_testing_db;Username=ai_testing_user;Password=StrongPassword123!'
+            # Expose the correct internal ports for the app
+            ASPNETCORE_URLS: http://+:8080
+            FRONTEND_EXTERNAL_URL: '${HOST_IP}:3000'
+        ports:
+            # Map the container port (8080) to the host machine port
+            - '8080:8080'
+            # Optional: Add 8081 if you need HTTPS
+            # - "8081:8081"
+        depends_on:
+            db:
+                condition: service_healthy
+        networks:
+            - app-network
+
+    # 3. Vite/React Frontend Service
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            # Map container port 80 (where Nginx serves the app) to host port 3000
+            - '3000:80'
+        depends_on:
+            # Ensure the API is running before attempting to serve the frontend
+            - backend
+        networks:
+            - app-network
+
+# Define a shared bridge network so all services can talk to each other
+networks:
+    app-network:
+        driver: bridge
+
+# Define a volume to persist the PostgreSQL data
+volumes:
+    postgres_data:
+        driver: local

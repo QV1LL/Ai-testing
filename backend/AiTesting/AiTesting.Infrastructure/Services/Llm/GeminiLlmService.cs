@@ -17,6 +17,8 @@ public class GeminiLlmService : ILlmService
 
     public GeminiLlmService(IConfiguration configuration)
     {
+        Console.WriteLine(System.Environment.GetEnvironmentVariable("GOOGLE_AI_API"));
+        
         var apiKey = System.Environment.GetEnvironmentVariable("GOOGLE_AI_API") ?? throw new InvalidOperationException("GOOGLE_AI_API environment variable is required.");
         _modelName = configuration["Llm:Gemini:ModelName"] ?? throw new InvalidOperationException("Gemini:ModelName configuration is required.");
         _client = new Client(apiKey: apiKey);

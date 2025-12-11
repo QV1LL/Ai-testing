@@ -19,8 +19,14 @@ builder.Services.AddApplication();
 
 builder.Services.AddDbContext<DbContext, AiTestingContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
+    var connectionString = builder.Configuration.GetConnectionString("ASPNETCORE_CONNECTION_STRING");
+    options.UseNpgsql(connectionString, o =>
+    {
+        o.EnableRetryOnFailure(
+            maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorCodesToAdd: null);
+    });
 });
 
 builder.Services.AddAuthentication("Bearer")
@@ -46,7 +52,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins(Environment.GetEnvironmentVariable("allowedOrigin")!)
+            policy.WithOrigins(builder.Configuration["AllowedHosts"]!, builder.Configuration["FRONTEND_EXTERNAL_URL"]!)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -65,14 +71,28 @@ using(var scope = app.Services.CreateScope())
     await scope.ServiceProvider.GetRequiredService<DbContext>().Database.EnsureCreatedAsync();
 }
 
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
+
+if (!Directory.Exists(uploadsPath))
+{
+    try
+    {
+        Directory.CreateDirectory(uploadsPath);
+        Console.WriteLine($"Created missing directory: {uploadsPath}");
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Failed to create uploads directory at {Path}", uploadsPath);
+    }
+}
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "uploads")),
+    FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
 
-//app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
