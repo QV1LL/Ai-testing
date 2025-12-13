@@ -17,6 +17,9 @@ builder.Services.AddDomain();
 builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
 
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
 builder.Services.AddDbContext<DbContext, AiTestingContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("ASPNETCORE_CONNECTION_STRING");
@@ -27,6 +30,8 @@ builder.Services.AddDbContext<DbContext, AiTestingContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorCodesToAdd: null);
     });
+    options.EnableSensitiveDataLogging();
+    options.EnableDetailedErrors();
 });
 
 builder.Services.AddAuthentication("Bearer")
@@ -46,13 +51,15 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
+Console.WriteLine($"External url: {builder.Configuration["FRONTEND_EXTERNAL_URL"]}");
+
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins(builder.Configuration["AllowedHosts"]!, builder.Configuration["FRONTEND_EXTERNAL_URL"]!)
+            policy.WithOrigins(builder.Configuration["FRONTEND_EXTERNAL_URL"]!)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();

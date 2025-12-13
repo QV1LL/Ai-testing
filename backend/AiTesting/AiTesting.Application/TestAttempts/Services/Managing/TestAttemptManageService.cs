@@ -1,4 +1,4 @@
-﻿using AiTesting.Application.TestAttempts.Dto.Managing;
+using AiTesting.Application.TestAttempts.Dto.Managing;
 using AiTesting.Application.Tests.Dto.Managing;
 using AiTesting.Domain.Common;
 using AiTesting.Domain.Models;
@@ -147,7 +147,10 @@ internal class TestAttemptManageService : ITestAttemptManageService
         );
 
         testAttempt.Answers.Clear();
-        _ = _testAttemptService.UpdateAsync(testAttempt);
+        var updateResult = await _testAttemptService.UpdateAsync(testAttempt);
+
+	if (updateResult.IsFailure)
+            return Result<TestAttemptResultDto>.Failure(updateResult.Error);
 
         return Result<TestAttemptResultDto>.Success(testAttemptResultDto);
     }

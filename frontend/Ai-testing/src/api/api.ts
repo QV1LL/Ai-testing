@@ -5,8 +5,9 @@ import { logout } from './profileService'
 export const ACCESS_TOKEN_KEY = 'access_token'
 export const REFRESH_TOKEN_KEY = 'refresh_token'
 
-const appOrigin = window.location.origin
-const BASE_URL = `${appOrigin.replace(':3000', ':8080')}/api`
+const BASE_URL = import.meta.env.VITE_BACKEND_URL
+
+console.log(`Backend: ${BASE_URL}`)
 
 export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY)
 export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY)

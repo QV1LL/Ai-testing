@@ -6,8 +6,6 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-ENV GOOGLE_AI_API AIzaSyASnJwd-f5GMXhhH5wwprIAhxfEaBkXOJQ
-
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build

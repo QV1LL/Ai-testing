@@ -5,6 +5,9 @@ FROM node:20-alpine AS build
 # Set the working directory inside the container
 WORKDIR /app
 
+ARG BACKEND_URL
+ENV VITE_BACKEND_URL=${BACKEND_URL}
+
 # Copy package.json and install dependencies
 # This is done separately to leverage Docker cache if only source code changes
 COPY ./Ai-testing/package-lock.json ./
