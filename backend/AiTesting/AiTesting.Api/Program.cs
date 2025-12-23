@@ -1,4 +1,5 @@
 using AiTesting.Application;
+using Microsoft.AspNetCore.HttpOverrides;
 using AiTesting.Domain;
 using AiTesting.Infrastructure;
 using AiTesting.Infrastructure.Persistence;
@@ -99,7 +100,12 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
-// app.UseHttpsRedirection();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

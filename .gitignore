@@ -6,6 +6,7 @@
 Domain.txt
 
 uploads/
+data/
 
 # User-specific files
 *.rsuser
